@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,6 +26,8 @@ final class AuthController extends AbstractController
         $user->setPassword($hashedPassword);
         $user->setName($data['name']);
         $user->setTelefon($data['telefon']);
+        $user->setCreatedAt(new DateTimeImmutable('now'));
+        $user->setUpdatedAt(new DateTime('now'));
         $user->setRoles(['ROLE_USER']);
 
         $em->persist($user);
