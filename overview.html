@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ca">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ERP Dashboard</title>
+    <link rel="stylesheet" href="style2.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+
+  <body>
+    <div class="layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-top">
+          <div class="logo">FibERP</div>
+          <button class="toggle-menu" id="menu-btn">
+            <i data-lucide="menu"></i>
+          </button>
+        </div>
+
+        <nav class="menu">
+          <a href="overview.html" class="active"
+            ><i data-lucide="home"></i> Resum</a
+          >
+          <a href="#"><i data-lucide="shopping-cart"></i> Vendes</a>
+          <a href="#"><i data-lucide="package"></i> Inventari</a>
+          <a href="#"><i data-lucide="wallet"></i> Finances</a>
+          <a href="#"><i data-lucide="users"></i> RRHH</a>
+          <a href="#"><i data-lucide="shield"></i> Seguretat</a>
+          <a href="perfil.html"><i data-lucide="user"></i> Gestió del compte</a>
+
+          <footer class="sidebar-footer">
+            <button class="logout-btn">
+              <i data-lucide="log-out"></i> Tancar sessió
+            </button>
+          </footer>
+        </nav>
+      </aside>
+
+      <!-- Main content -->
+      <main class="main-content">
+        <header class="page-header">
+          <div>
+            <h1>Hola @user!</h1>
+            <p class="lead">Benvingut al panell principal del sistema</p>
+          </div>
+        </header>
+
+        <section class="main-image">
+          <div class="image-container">
+            <img src="img/fabrica.avif" alt="Fàbrica" class="right-image" />
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      lucide.createIcons();
+
+      // Toggle sidebar per a mòbils
+      const menuBtn = document.getElementById("menu-btn");
+      const sidebar = document.querySelector(".sidebar");
+      menuBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+      });
+    </script>
+  </body>
+</html>
