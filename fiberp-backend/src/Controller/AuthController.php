@@ -6,6 +6,7 @@ use App\Entity\User;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,9 +41,9 @@ final class AuthController extends AbstractController
     }
 
     #[Route('/login', name: 'api_login', methods: ['POST'])]
-    public function login(): JsonResponse
+    public function login(LoggerInterface $logger): JsonResponse
     {
         // This method can be left empty, as the security layer will handle the authentication
-        return new JsonResponse(['status' => 'Logged in'], 200);
+        return new JsonResponse(['status' => 'Logged in'], 401);
     }
 }

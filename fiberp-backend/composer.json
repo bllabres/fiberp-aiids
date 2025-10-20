@@ -18,6 +18,7 @@
         "symfony/flex": "^2",
         "symfony/framework-bundle": "7.3.*",
         "symfony/http-foundation": "7.3.*",
+        "symfony/monolog-bundle": "^3.10",
         "symfony/routing": "7.3.*",
         "symfony/runtime": "7.3.*",
         "symfony/security-bundle": "7.3.*",
