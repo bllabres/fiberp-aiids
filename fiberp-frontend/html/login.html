@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pantalla de inicio de sesión — FibERP</title>
+    <meta
+      name="description"
+      content="Página de inicio de sesión moderna, accesible y responsiva para FibERP."
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+    <script src="../js/login.js" defer></script>
+  </head>
+  <body>
+    <main class="container" role="main">
+      <section class="hero fade-up" aria-hidden="false">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">FibERP</div>
+        </div>
+        <h1>Benvingut/da</h1>
+        <p class="lead">Inicia sessió o crea un compte per accedir</p>
+        <footer class="small">
+          Has oblidat la contrassenya?
+          <a
+            href="passwordReset.html"
+            style="color: var(--accent); text-decoration: none"
+            >Clica aquí</a
+          >
+        </footer>
+      </section>
+
+      <aside class="card fade-up" aria-label="Formulario de inicio de sesión">
+        <form id="loginForm" novalidate>
+          <div>
+            <label for="email">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              inputmode="email"
+              autocomplete="email"
+              placeholder="tu@empresa.com"
+              required
+              aria-required="true"
+            />
+            <div
+              class="error"
+              id="emailError"
+              aria-live="polite"
+              style="display: none"
+            ></div>
+          </div>
+
+          <div>
+            <label for="password">Contrassenya</label>
+            <div class="password-field">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="••••••••"
+                required
+                aria-required="true"
+                minlength="6"
+              />
+              <button
+                type="button"
+                class="toggle-pass"
+                id="togglePass"
+                aria-label="Mostrar contraseña"
+              >
+                Mostrar
+              </button>
+            </div>
+            <div
+              class="error"
+              id="passError"
+              aria-live="polite"
+              style="display: none"
+            ></div>
+          </div>
+
+          <!-- Botón de envío -->
+          <button class="btn" id="submitBtn" type="submit">Entrar</button>
+
+          <!-- Enlace para crear cuenta -->
+          <div style="margin-top: 12px; font-size: 13px; color: var(--muted)">
+            No estàs registrat?
+            <a
+              href="register.html"
+              style="color: var(--accent); text-decoration: none"
+              >Crea un compte</a
+            >
+          </div>
+        </form>
+      </aside>
+    </main>
+  </body>
+</html>

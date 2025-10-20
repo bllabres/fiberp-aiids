@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ca">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Registre — FibERP</title>
+    <meta
+      name="description"
+      content="Pàgina de registre moderna, accessible i responsiva per a FibERP."
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <main class="container" role="main">
+      <section class="hero fade-up" aria-hidden="false">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">FibERP</div>
+        </div>
+        <h1>Crea un compte</h1>
+        <p class="lead">Introdueix les teves dades per registrar-te</p>
+        <footer class="small">
+          Ja tens un compte?
+          <a
+            href="login.html"
+            style="color: var(--accent); text-decoration: none"
+            >Inicia sessió</a
+          >
+        </footer>
+      </section>
+
+      <aside class="card fade-up" aria-label="Formulari de registre">
+        <form id="registerForm" novalidate>
+          <div>
+            <label for="name">Nom</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="Nom"
+              required
+            />
+            <div class="error" id="nameError" style="display: none"></div>
+          </div>
+
+          <div>
+            <label for="telefon">Telèfon</label>
+            <input
+              id="telefon"
+              name="telefon"
+              type="text"
+              placeholder="+34 600 000 000"
+              required
+            />
+            <div class="error" id="telefonError" style="display: none"></div>
+          </div>
+
+          <div>
+            <label for="email">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="tu@empresa.com"
+              required
+            />
+            <div class="error" id="emailError" style="display: none"></div>
+          </div>
+
+          <div>
+            <label for="password">Contrasenya</label>
+            <div class="password-field">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                minlength="6"
+              />
+              <button
+                type="button"
+                class="toggle-pass"
+                id="togglePass1"
+                aria-label="Mostrar contrasenya"
+              >
+                Mostrar
+              </button>
+            </div>
+            <div class="error" id="passError" style="display: none"></div>
+          </div>
+
+          <div>
+            <label for="confirmPassword">Confirma la contrasenya</label>
+            <div class="password-field">
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                required
+                minlength="6"
+              />
+              <button
+                type="button"
+                class="toggle-pass"
+                id="togglePass2"
+                aria-label="Mostrar contrasenya"
+              >
+                Mostrar
+              </button>
+            </div>
+            <div
+              class="error"
+              id="confirmPassError"
+              style="display: none"
+            ></div>
+          </div>
+
+          <button class="btn" type="submit" id="submitBtn">Registrar-se</button>
+        </form>
+      </aside>
+    </main>
+
+    <script src="../js/register.js"></script>
+  </body>
+</html>
