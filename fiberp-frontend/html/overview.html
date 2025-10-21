@@ -20,9 +20,7 @@
         </div>
 
         <nav class="menu">
-          <a href="overview.html" class="active"
-            ><i data-lucide="home"></i> Resum</a
-          >
+          <a href="overview.html"><i data-lucide="home"></i> Resum</a>
           <a href="#"><i data-lucide="shopping-cart"></i> Vendes</a>
           <a href="#"><i data-lucide="package"></i> Inventari</a>
           <a href="#"><i data-lucide="wallet"></i> Finances</a>
@@ -54,16 +52,6 @@
         </section>
       </main>
     </div>
-
-    <script>
-      lucide.createIcons();
-
-      // Toggle sidebar per a mòbils
-      const menuBtn = document.getElementById("menu-btn");
-      const sidebar = document.querySelector(".sidebar");
-      menuBtn.addEventListener("click", () => {
-        sidebar.classList.toggle("open");
-      });
-    </script>
+    <script src="../js/overview.js"></script>
   </body>
 </html>
