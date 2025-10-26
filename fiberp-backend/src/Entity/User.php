@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -43,6 +45,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?\DateTime $updated_at = null;
+
+    #[ORM\OneToOne(mappedBy: 'treballador', cascade: ['persist', 'remove'])]
+    private ?Sou $sou = null;
+
+    /**
+     * @var Collection<int, Fitxatge>
+     */
+    #[ORM\OneToMany(targetEntity: Fitxatge::class, mappedBy: 'usuari', orphanRemoval: true)]
+    private Collection $fitxatges;
+
+    public function __construct()
+    {
+        $this->fitxatges = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -169,6 +185,53 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUpdatedAt(\DateTime $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getSou(): ?Sou
+    {
+        return $this->sou;
+    }
+
+    public function setSou(Sou $sou): static
+    {
+        // set the owning side of the relation if necessary
+        if ($sou->getTreballador() !== $this) {
+            $sou->setTreballador($this);
+        }
+
+        $this->sou = $sou;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Fitxatge>
+     */
+    public function getFitxatges(): Collection
+    {
+        return $this->fitxatges;
+    }
+
+    public function addFitxatge(Fitxatge $fitxatge): static
+    {
+        if (!$this->fitxatges->contains($fitxatge)) {
+            $this->fitxatges->add($fitxatge);
+            $fitxatge->setUsuari($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFitxatge(Fitxatge $fitxatge): static
+    {
+        if ($this->fitxatges->removeElement($fitxatge)) {
+            // set the owning side to null (unless already changed)
+            if ($fitxatge->getUsuari() === $this) {
+                $fitxatge->setUsuari(null);
+            }
+        }
 
         return $this;
     }

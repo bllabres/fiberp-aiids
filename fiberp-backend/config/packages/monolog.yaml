@@ -1,5 +1,5 @@
 monolog:
-    channels: [deprecation, 'login'] # Deprecations are logged in the dedicated "deprecation" channel when it exists
+    channels: [deprecation, 'login', 'user'] # Deprecations are logged in the dedicated "deprecation" channel when it exists
 
 when@dev:
     monolog:
@@ -14,6 +14,11 @@ when@dev:
                 path: "%kernel.logs_dir%/login.log"
                 level: info
                 channels: [ 'login' ]  # 👈 Handler asociado al canal "login"
+            user:
+                type: stream
+                path: "%kernel.logs_dir%/login.log"
+                level: info
+                channels: [ 'user' ]  # 👈 Handler asociado al canal "user"
             # uncomment to get logging in your browser
             # you may have to allow bigger header sizes in your Web server configuration
             #firephp:
