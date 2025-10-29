@@ -6,17 +6,17 @@ when@dev:
         handlers:
             main:
                 type: stream
-                path: "%kernel.logs_dir%/%kernel.environment%.log"
+                path: "%env(LOG_PATH)%/%kernel.environment%.log"
                 level: debug
                 channels: ["!event"]
             login:
                 type: stream
-                path: "%kernel.logs_dir%/login.log"
+                path: "%env(LOG_PATH)%/login.log"
                 level: info
                 channels: [ 'login' ]  # 👈 Handler asociado al canal "login"
             user:
                 type: stream
-                path: "%kernel.logs_dir%/login.log"
+                path: "%env(LOG_PATH)%/user.log"
                 level: info
                 channels: [ 'user' ]  # 👈 Handler asociado al canal "user"
             # uncomment to get logging in your browser
@@ -43,7 +43,7 @@ when@test:
                 channels: ["!event"]
             nested:
                 type: stream
-                path: "%kernel.logs_dir%/%kernel.environment%.log"
+                path: "%env(LOG_PATH)%/%kernel.environment%.log"
                 level: debug
 
 when@prod:
