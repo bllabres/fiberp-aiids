@@ -49,7 +49,7 @@ form.addEventListener("submit", async function (e) {
   console.log(password.value);
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/login", {
+    const response = await fetch("http://10.4.41.69:8080/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -71,7 +71,7 @@ form.addEventListener("submit", async function (e) {
     console.log("Inici de sessió correcte:", data);
     localStorage.setItem("token", data.token);
     alert("Sessió iniciada correctament!");
-    window.location.href = "../html/overview.html";
+    window.location.href = "../overview.html";
   } catch (error) {
     console.error("Error d'inici de sessió:", error);
     showError(passError, error.message);

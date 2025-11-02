@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     submitBtn.textContent = "Creant compte...";
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/register", {
+      const response = await fetch("http://10.4.41.69:8080/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
       console.log("✅ Usuari creat correctament:", data);
       alert("Compte creat correctament! Ara pots iniciar sessió.");
-      window.location.href = "overview.html";
+      window.location.href = "../overview.html";
     } catch (error) {
       console.error("Error al registrar:", error);
       showError(confirmPassError, error.message);
