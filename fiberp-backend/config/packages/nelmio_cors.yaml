@@ -1,13 +1,19 @@
 nelmio_cors:
     defaults:
-        allow_origin: [ '*' ]           # Permite cualquier origen (desarrollo)
+        allow_origin: [ 'http://localhost:80' ]           # Permite el frontend
         allow_credentials: true
         allow_headers: [ 'Content-Type', 'Authorization' ]
         allow_methods: [ 'GET', 'POST', 'PUT', 'DELETE', 'OPTIONS' ]
         max_age: 3600
     paths:
         "^/login":
-            allow_origin: [ "*" ]
-            allow_headers: [ "*" ]
+            allow_origin: [ 'http://localhost:3000' ]
+            llow_headers: [ 'Content-Type' ]
             allow_methods: ["POST", "OPTIONS"]
+            allow_credentials: true
+
+        '^/': # Aplica a todas las rutas
+            allow_origin: [ 'http://localhost:3000' ]  # URL de tu frontend
+            allow_headers: [ 'Content-Type', 'Authorization' ]
+            allow_methods: [ 'GET', 'POST', 'PUT', 'DELETE', 'OPTIONS' ]
             allow_credentials: true
