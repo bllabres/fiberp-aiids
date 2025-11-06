@@ -31,18 +31,16 @@ class LoginSubscriber implements EventSubscriberInterface
     {
         $user = $event->getUser();
 
-        // Si tu entidad User tiene getUserIdentifier() o getEmail()
         $username = method_exists($user, 'getUserIdentifier') ?
             $user->getUserIdentifier() :
             (method_exists($user, 'getEmail') ? $user->getEmail() : 'unknown');
 
         $ip = $event->getRequest()->getClientIp();
 
-        $this->logger->info(sprintf(
-            'Inicio de sesión exitoso para "%s" desde IP %s',
-            $username,
-            $ip
-        ));
+        $this->logger->info('Inicio de sesión exitoso', [
+            'ip' => $ip,
+            'user' => $username
+        ]);
     }
 
     public function onLoginFailure(LoginFailureEvent $event): void
@@ -51,12 +49,11 @@ class LoginSubscriber implements EventSubscriberInterface
         $ip = $event->getRequest()->getClientIp();
         $error = $event->getException()->getMessageKey();
 
-        $this->logger->warning(sprintf(
-            'Fallo de inicio de sesion para "%s" desde %s (%s)',
-            $credentials ?: 'usuario desconocido',
-            $ip,
-            $error
-        ));
+        $this->logger->warning('Fallo de inicio de sesion', [
+            'ip' => $ip,
+            'error' => $error,
+            'user' => $credentials ?: 'usuario desconocido'
+        ]);
     }
 
 }
