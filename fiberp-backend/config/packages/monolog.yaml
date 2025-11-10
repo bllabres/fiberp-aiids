@@ -9,16 +9,19 @@ when@dev:
                 path: "%kernel.logs_dir%/%kernel.environment%.log"
                 level: debug
                 channels: ["!event"]
+                formatter: monolog.formatter.custom_line
             login:
                 type: stream
                 path: "%kernel.logs_dir%/login.log"
                 level: info
                 channels: [ 'login' ]  # 👈 Handler asociado al canal "login"
+                formatter: monolog.formatter.custom_line
             user:
                 type: stream
                 path: "%kernel.logs_dir%/user.log"
                 level: info
                 channels: [ 'user' ]  # 👈 Handler asociado al canal "user"
+                formatter: monolog.formatter.custom_line
             # uncomment to get logging in your browser
             # you may have to allow bigger header sizes in your Web server configuration
             #firephp:

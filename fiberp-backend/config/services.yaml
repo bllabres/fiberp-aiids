@@ -16,5 +16,13 @@ services:
     App\:
         resource: '../src/'
 
+    monolog.formatter.custom_line:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "%%channel%%: [%%datetime%%] %%channel%%.%%level_name%%: %%message%% %%context%%\n"
+            - "Y-m-d\\TH:i:s.uP"# dateFormat (usa el predeterminado)
+            - "false"    # allowInlineLineBreaks
+            - "true"# ignoreEmptyContextAndExtra
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
