@@ -1,5 +1,5 @@
 monolog:
-    channels: [deprecation, 'login', 'user'] # Deprecations are logged in the dedicated "deprecation" channel when it exists
+    channels: [deprecation, 'login', 'user', 'order', 'product', 'file_upload'] # Deprecations are logged in the dedicated "deprecation" channel when it exists
 
 when@dev:
     monolog:
@@ -21,6 +21,24 @@ when@dev:
                 path: "%kernel.logs_dir%/user.log"
                 level: info
                 channels: [ 'user' ]  # 👈 Handler asociado al canal "user"
+                formatter: monolog.formatter.custom_line
+            order:
+                type: stream
+                path: "%kernel.logs_dir%/order.log"
+                level: debug
+                channels: [ "order" ]
+                formatter: monolog.formatter.custom_line
+            product:
+                type: stream
+                path: "%kernel.logs_dir%/product.log"
+                level: debug
+                channels: [ "product" ]
+                formatter: monolog.formatter.custom_line
+            file_upload:
+                type: stream
+                path: "%kernel.logs_dir%/file_upload.log"
+                level: debug
+                channels: [ "file_upload" ]
                 formatter: monolog.formatter.custom_line
             # uncomment to get logging in your browser
             # you may have to allow bigger header sizes in your Web server configuration

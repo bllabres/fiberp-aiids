@@ -42,7 +42,7 @@ final class AuthController extends AbstractController
     }
 
     #[Route('/login', name: 'api_login', methods: ['POST'])]
-    public function login(LoggerInterface $logger): JsonResponse
+    public function login(): JsonResponse
     {
         // This method can be left empty, as the security layer will handle the authentication
         return new JsonResponse(['status' => 'Logged in'], 401);
