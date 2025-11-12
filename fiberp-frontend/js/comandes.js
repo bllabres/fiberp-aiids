@@ -1,6 +1,5 @@
 function runWithToken(callback) {
-  //const token = localStorage.getItem("token");
-  const token = 1; // Simulació de token
+  const token = localStorage.getItem("token");
   if (!token) {
     window.location.href = "login.html";
     return;
@@ -35,39 +34,8 @@ runWithToken((token) => {
   });
 
   // ------------------------
-  // Comandes locals de prova
+  // Fetch real del backend
   // ------------------------
-  const mockOrders = [
-    {
-      id: 101,
-      estat: "Pendents",
-      total: 120.5,
-      albara: "ALB-001",
-      num_products: 3,
-    },
-    {
-      id: 102,
-      estat: "Enviades",
-      total: 75.0,
-      albara: "ALB-002",
-      num_products: 2,
-    },
-    {
-      id: 103,
-      estat: "Cancel·lades",
-      total: 0.0,
-      albara: null,
-      num_products: 0,
-    },
-    {
-      id: 104,
-      estat: "Completades",
-      total: 200.99,
-      albara: "ALB-004",
-      num_products: 5,
-    },
-  ];
-
   function displayOrders(orders) {
     const tbody = document.querySelector("#orders-table tbody");
     tbody.innerHTML = orders
@@ -85,16 +53,13 @@ runWithToken((token) => {
       .join("");
   }
 
-  // Mostrar primer les comandes locals
-  displayOrders(mockOrders);
-
-  // ------------------------
-  // Fetch real del backend
-  // ------------------------
   async function fetchOrders() {
     try {
       const response = await fetch("http://10.4.41.69:8080/order", {
-        headers: { Accept: "application/json" },
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`, // si el backend requereix token
+        },
       });
 
       if (!response.ok) {
@@ -102,13 +67,19 @@ runWithToken((token) => {
       }
 
       const orders = await response.json();
-      displayOrders(orders); // Reemplaça les dades locals amb les reals
+      displayOrders(orders);
     } catch (error) {
-      console.warn(error.message);
-      // Les comandes locals continuen mostrant-se si el fetch falla
+      console.error("Error carregant les comandes:", error);
+      const tbody = document.querySelector("#orders-table tbody");
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align:center; color:red;">
+            Error carregant les comandes: ${error.message}
+          </td>
+        </tr>`;
     }
   }
 
   // Executa la crida real al backend
-  //fetchOrders();
+  fetchOrders();
 });
