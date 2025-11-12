@@ -25,8 +25,8 @@ class FitxatgeRepository extends ServiceEntityRepository
         $dataFi = (new \DateTime('today'))->setTime(23, 59, 59);
 
         $q = $rep_fitxatge->createQueryBuilder('f')
-            ->where('f.user = :user')
-            ->andWhere('f.data_inici BETWEEN :inicio AND :fin')
+            ->where('f.usuari = :user')
+            ->andWhere('f.hora_inici BETWEEN :inicio AND :fin')
             ->setParameter('user', $user)
             ->setParameter('inicio', $dataInici)
             ->setParameter('fin', $dataFi)
@@ -42,15 +42,15 @@ class FitxatgeRepository extends ServiceEntityRepository
         $dataFi = (new \DateTime('today'))->setTime(23, 59, 59);
 
         $q = $rep_fitxatge->createQueryBuilder('f')
-            ->where('f.user = :user')
-            ->andWhere('f.data_inici BETWEEN :inicio AND :fin')
+            ->where('f.usuari = :user')
+            ->andWhere('f.hora_inici BETWEEN :inicio AND :fin')
             ->setParameter('user', $user)
             ->setParameter('inicio', $dataInici)
             ->setParameter('fin', $dataFi)
             ->getQuery();
         $res = $q->getResult();
         if ($res !== null) {
-            return $res;
+            return is_array($res) && count($res) > 0 ? $res[0] : $res;
         }
         return false;
     }

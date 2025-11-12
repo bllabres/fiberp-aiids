@@ -27,29 +27,6 @@ final class UserController extends AbstractController
         $this->logger = $logger;
     }
 
-    #[Route('/user/{id}', name: 'app_user_by_id', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function getUserDataById(int $id, EntityManagerInterface $em): JsonResponse
-    {
-        $admin = $this->getUser();
-        $user = $em->getRepository(User::class)->find($id);
-
-        if (!$user) {
-            $this->logger->warning('User not found when fetching by id', ['target_id' => $id, 'actor_id' => $admin?->getId()]);
-            return $this->json(['error' => 'User not found'], 404);
-        }
-
-        $this->logger->info('Fetched user data by id', ['target_id' => $id, 'actor_id' => $admin?->getId()]);
-        return $this->json([
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-            'name' => $user->getName(),
-            'telefon' => $user->getTelefon(),
-            'roles' => $user->getRoles(),
-            'createdAt' => $user->getCreatedAt()->format('Y-m-d H:i:s'),
-        ]);
-    }
-
     #[Route('/user', name: 'app_user')]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function getUserData(): JsonResponse
@@ -133,6 +110,56 @@ final class UserController extends AbstractController
         ]);
     }
 
+    #[Route('/user/fitxa', name: 'app_user_post_fitxa', methods: ['POST'])]
+    public function iniciarFitxatge(EntityManagerInterface $em): JsonResponse {
+        $user = $this->getUser();
+        $rep_fitxatge = $em->getRepository(Fitxatge::class);
+        if ($rep_fitxatge->hasOneActive($user)) {
+            return $this->json(['error' => 'Fitxa activa'], 400);
+        }
+
+        $fitxa = new Fitxatge();
+        $fitxa->setUsuari($user);
+        $fitxa->setHoraInici(new DateTime('now'));
+        $em->persist($fitxa);
+        $em->flush();
+        return $this->json([['status' => 'succcess']]);
+    }
+
+    #[Route('/user/fitxa', name: 'app_user_delete_fitxa', methods: ['DELETE'])]
+    public function acabarFitxa(EntityManagerInterface $em): JsonResponse {
+        $user = $this->getUser();
+        $rep_fitxatge = $em->getRepository(Fitxatge::class);
+        $fitxa = $rep_fitxatge->getFitxaActual($user);
+        if (!$fitxa) {
+            return $this->json(['error' => 'Cap fitxa activa'], 400);
+        }
+
+        $fitxa->setHoraFi(new DateTime('now'));
+        $em->persist($fitxa);
+        $em->flush();
+        return $this->json([['status' => 'succcess']]);
+    }
+
+    #[Route('/user/sou', name: 'app_user_sou')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function getUserSou(): JsonResponse
+    {
+        $user = $this->getUser();
+        $sou = $user->getSou();
+
+        if (!$sou) {
+            return $this->json(['error' => 'No salary data found'], 404);
+        }
+
+        return $this->json([
+            'salari_base' => $sou->getSalariBase(),
+            'complements' => $sou->getComplements(),
+            'irpf_actual' => $sou->getIrpfActual(),
+            'seguretat_social_actual' => $sou->getSeguretatSocialActual(),
+        ]);
+    }
+
     #[Route('/user/{id}', name: 'app_user_update_by_id', methods: ['PUT', 'PATCH'])]
     #[IsGranted('ROLE_ADMIN')]
     public function updateUserById(int $id, Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): JsonResponse
@@ -193,26 +220,29 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/user/sou', name: 'app_user_sou')]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    public function getUserSou(): JsonResponse
+    #[Route('/user/{id}', name: 'app_user_by_id', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function getUserDataById(int $id, EntityManagerInterface $em): JsonResponse
     {
-        $user = $this->getUser();
-        $sou = $user->getSou();
+        $admin = $this->getUser();
+        $user = $em->getRepository(User::class)->find($id);
 
-        if (!$sou) {
-            return $this->json(['error' => 'No salary data found'], 404);
+        if (!$user) {
+            $this->logger->warning('User not found when fetching by id', ['target_id' => $id, 'actor_id' => $admin?->getId()]);
+            return $this->json(['error' => 'User not found'], 404);
         }
 
+        $this->logger->info('Fetched user data by id', ['target_id' => $id, 'actor_id' => $admin?->getId()]);
         return $this->json([
-            'salari_base' => $sou->getSalariBase(),
-            'complements' => $sou->getComplements(),
-            'irpf_actual' => $sou->getIrpfActual(),
-            'seguretat_social_actual' => $sou->getSeguretatSocialActual(),
-            'data_inici' => $sou->getDataInici()->format('Y-m-d'),
-            'data_fi' => $sou->getDataFi() ? $sou->getDataFi()->format('Y-m-d') : null,
+            'id' => $user->getId(),
+            'email' => $user->getEmail(),
+            'name' => $user->getName(),
+            'telefon' => $user->getTelefon(),
+            'roles' => $user->getRoles(),
+            'createdAt' => $user->getCreatedAt()->format('Y-m-d H:i:s'),
         ]);
     }
+
     #[Route('/user/{id}/sou', name: 'app_user_sou_update_by_id', methods: ['PUT', 'PATCH'])]
     #[IsGranted('ROLE_ADMIN')]
     public function updateUserSouById(int $id, Request $request, EntityManagerInterface $em): JsonResponse
@@ -309,36 +339,5 @@ final class UserController extends AbstractController
             'status' => 'User deleted',
             'id' => $id,
         ]);
-    }
-
-    #[Route('/user/fitxa', name: 'app_user_post_fitxa', methods: ['POST'])]
-    public function iniciarFitxatge(EntityManagerInterface $em): JsonResponse {
-        $user = $this->getUser();
-        $rep_fitxatge = $em->getRepository(Fitxatge::class);
-        if ($rep_fitxatge->hasOneActive($user)) {
-            return $this->json(['error' => 'Fitxa activa'], 400);
-        }
-
-        $fitxa = new Fitxatge();
-        $fitxa->setUsuari($user);
-        $fitxa->setHoraInici(new DateTime('now'));
-        $em->persist($fitxa);
-        $em->flush();
-        return $this->json([['status' => 'succcess']]);
-    }
-
-    #[Route('/user/fitxa', name: 'app_user_delete_fitxa', methods: ['DELETE'])]
-    public function acabarFitxa(EntityManagerInterface $em): JsonResponse {
-        $user = $this->getUser();
-        $rep_fitxatge = $em->getRepository(Fitxatge::class);
-        $fitxa = $rep_fitxatge->getFitxaActual($user);
-        if (!$fitxa) {
-            return $this->json(['error' => 'Cap fitxa activa'], 400);
-        }
-
-        $fitxa->setHoraFi(new DateTime('now'));
-        $em->persist($fitxa);
-        $em->flush();
-        return $this->json([['status' => 'succcess']]);
     }
 }

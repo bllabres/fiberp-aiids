@@ -299,7 +299,7 @@ Campos de `Comanda` en respuestas:
 - `id` (number)
 - `estat` (string)
 - `total` (string decimal) — calculado automáticamente a partir de los items
-- `albara` (string)
+- `albara` (string, opcional)
 - `num_products` (number) — suma de `quantitat` de todos los items
 - `items` (solo en GET detalle) — lista de líneas con: `id`, `producte` {`id`, `nom`, `preu`}, `quantitat`, `total`
 
@@ -309,23 +309,39 @@ Esquema de `items` en creación/actualización:
 Endpoints:
 - GET `/order` — Lista comandas con `num_products` agregado.
 - GET `/order/{id}` — Detalle con `items` y `num_products`.
-- POST `/order` — Crea comanda con items. Requeridos: `estat`, `albara`, `items`.
+- POST `/order` — Crea comanda. Requeridos: `estat`, `items`. Opcional: `albara` o PDF subido.
 - PUT|PATCH `/order/{id}` — Actualiza `estat` y/o `albara`. Si se envía `items`, se reemplazan todas las líneas y se recalcula el total.
 - DELETE `/order/{id}` — Elimina una comanda e, implícitamente, sus items (por mapeo con `orphanRemoval`).
 
-Seguridad:
-- Todos estos endpoints requieren JWT y en el código están anotados con `#[IsGranted('IS_AUTHENTICATED_FULLY')]`.
+Importante: formato uniforme para creación
+- Todas las peticiones de creación de comanda (ya sea multipart/form-data o JSON) DEBEN incluir:
+  - `estat` (string)
+  - `items` (array)
+- El `albara` es OPCIONAL:
+  - Si subes un archivo PDF debe enviarse como campo de formulario `albara_file` (multipart/form-data). El archivo será almacenado y el campo Comanda.albara se establecerá en la ruta relativa almacenada.
+  - Si usas application/json, opcionalmente puedes proporcionar `"albara": "uploads/albarans/example.pdf"`.
 
-Ejemplos curl:
+Ejemplos:
 
-1) Crear comanda
+1) Crear comanda con multipart/form-data y subida de PDF (recomendado al adjuntar un PDF)
+```bash
+curl -X POST http://127.0.0.1:8000/order \
+  -H "Authorization: Bearer <JWT>" \
+  -F "albara_file=@/path/to/albara.pdf" \
+  -F 'estat=nou' \
+  -F 'items=[{"producteId":1,"quantitat":2},{"producteId":3,"quantitat":1}]'
+```
+- Los archivos subidos se almacenan en `public/uploads/albarans/`.
+- El campo Comanda.albara guardado contendrá la ruta relativa `uploads/albarans/<filename>`.
+
+2) Crear comanda con application/json y una ruta de albara proporcionada
 ```bash
 curl -X POST http://127.0.0.1:8000/order \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <JWT>" \
   -d '{
     "estat": "pendent",
-    "albara": "ALB-123",
+    "albara": "uploads/albarans/example.pdf",
     "items": [
       { "producteId": 1, "quantitat": 2 },
       { "producteId": 3, "quantitat": 5 }
@@ -333,57 +349,27 @@ curl -X POST http://127.0.0.1:8000/order \
   }'
 ```
 
-2) Detalle de comanda
+3) Crear comanda con application/json SIN albara (albara será null)
 ```bash
-curl -H "Authorization: Bearer <JWT>" http://127.0.0.1:8000/order/1
-```
-
-3) Reemplazar items y actualizar estado
-```bash
-curl -X PATCH http://127.0.0.1:8000/order/1 \
+curl -X POST http://127.0.0.1:8000/order \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <JWT>" \
   -d '{
-    "estat": "confirmada",
-    "items": [ { "producteId": 2, "quantitat": 1 } ]
+    "estat": "pendent",
+    "items": [
+      { "producteId": 1, "quantitat": 2 }
+    ]
   }'
 ```
 
-4) Borrar
-```bash
-curl -X DELETE -H "Authorization: Bearer <JWT>" http://127.0.0.1:8000/order/1 -i
-```
+## Detalles de subida de albaranes (PDF)
 
-Códigos y validaciones:
-- 201 creación, 200 lectura/actualización, 204 borrado.
-- 400 cuando: JSON inválido; `items` no es array; falta `producteId`/`quantitat`; `quantitat` ≤ 0; `producteId` inexistente.
-- 404 cuando la comanda no existe.
+- Nombre del campo multipart/form-data para el archivo: `albara_file` (PDF requerido).
+- Campos de formulario: `estat` y `items` (items pueden ser proporcionados como una cadena JSON).
+- Ruta de almacenamiento: `public/uploads/albarans/` (Comanda.albara almacena `uploads/albarans/<filename>`).
+- Validación: el servidor validará el MIME/extension del archivo como PDF al subir.
 
-Notas:
-- El `total` de la comanda se calcula como suma de `total` por línea (`preu` del `Producte` × `quantitat`). Cualquier `total` enviado por cliente es ignorado.
+## Logging
 
-## Endpoints de usuario (ampliados)
-
-Además de los documentados más arriba (`/register`, `/login`, `/user`), existen endpoints adicionales:
-
-- Actualizar salario del usuario por ID (solo ADMIN):
-  - PUT|PATCH `/user/{id}/sou`
-  - Body (cualquiera de los campos, numéricos como string o número): `salari_base`, `complements`, `irpf_actual`, `seguretat_social_actual`
-  - Respuestas: 200 OK con los valores actualizados; 400 si JSON inválido o sin campos a actualizar; 404 si el usuario no existe.
-
-- Fichaje (inicio/fin) para el usuario autenticado:
-  - POST `/user/fitxa` — Inicia fichaje actual; 400 si ya hay uno activo.
-  - DELETE `/user/fitxa` — Finaliza fichaje actual; 400 si no hay fichaje activo.
-
-## Seguridad (resumen actualizado)
-
-- Rutas públicas: `/login` y `/register`.
-- Rutas protegidas: resto de endpoints. En `OrderController` esta protección está reforzada con `#[IsGranted('IS_AUTHENTICATED_FULLY')]`.
-- Enviar `Authorization: Bearer <JWT>` en las peticiones protegidas.
-
-## Cambios recientes relevantes
-
-- Nuevo CRUD de Productos (`ProductController`) con campos `nom`, `preu`, `descripcio`, `quantitat`.
-- CRUD de Comandas (`OrderController`) ahora gestiona `ItemComanda` para cada línea, calcula `total`, expone `num_products` y lista de `items` en detalle.
-- Seguridad aplicada en endpoints de `OrderController` con `IsGranted`.
+All file interactions (upload attempts, validation failures, storage errors, successes) are logged via the file logger service `monolog.logger.file_upload`. Order lifecycle events continue to be logged via the standard order logger.
 

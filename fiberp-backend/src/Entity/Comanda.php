@@ -22,7 +22,7 @@ class Comanda
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $total = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $albara = null;
 
     /**
@@ -70,7 +70,7 @@ class Comanda
         return $this->albara;
     }
 
-    public function setAlbara(string $albara): static
+    public function setAlbara(?string $albara): static
     {
         $this->albara = $albara;
 

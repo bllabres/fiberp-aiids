@@ -18,6 +18,7 @@
         "symfony/flex": "^2.8.2",
         "symfony/framework-bundle": "7.3.*",
         "symfony/http-foundation": "7.3.*",
+        "symfony/mime": "7.3.*",
         "symfony/monolog-bundle": "^3.10",
         "symfony/routing": "7.3.*",
         "symfony/runtime": "7.3.*",
@@ -77,6 +78,11 @@
         }
     },
     "require-dev": {
-        "symfony/maker-bundle": "^1.64"
+        "phpunit/phpunit": "^12.4",
+        "symfony/browser-kit": "7.3.*",
+        "symfony/css-selector": "7.3.*",
+        "symfony/http-client": "7.3.*",
+        "symfony/maker-bundle": "^1.64",
+        "symfony/phpunit-bridge": "^7.3"
     }
 }
