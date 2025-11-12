@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Canviar dades d'usuari</title>
     <link rel="stylesheet" href="css/style2.css" />
-    <!-- Iconos Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
   </head>
 
@@ -34,8 +33,7 @@
 
           <footer class="sidebar-footer">
             <button class="logout-btn">
-              <i data-lucide="log-out"></i>
-              Tancar sessió
+              <i data-lucide="log-out"></i> Tancar sessió
             </button>
           </footer>
         </nav>
@@ -43,19 +41,25 @@
 
       <main class="content">
         <section class="perfil-wrapper">
-          <!-- Panel lateral con vista previa -->
+          <!-- Panel lateral amb vista prèvia -->
           <aside class="perfil-preview">
             <img
               src="img/user.jpg"
               alt="Avatar del usuario"
               class="perfil-avatar"
             />
-            <h2 class="perfil-nombre">user</h2>
-            <p class="perfil-email">user@empresa.com</p>
+            <h2 id="perfil-nombre">user</h2>
+            <p id="perfil-email">user@empresa.com</p>
             <hr />
             <ul class="perfil-info">
-              <li><strong>Rol:</strong> Administradora</li>
-              <li><strong>Empresa:</strong> empresa</li>
+              <li>
+                <strong>Rol:</strong>
+                <span id="perfil-rol">Administradora</span>
+              </li>
+              <li>
+                <strong>Empresa:</strong>
+                <span id="perfil-empresa">empresa</span>
+              </li>
             </ul>
           </aside>
 
@@ -67,11 +71,11 @@
               <div class="form-grid">
                 <div>
                   <label for="nom">Nom complet</label>
-                  <input type="text" id="nom" placeholder="Nom" disabled />
+                  <input type="text" id="nom" placeholder="Nom" />
                 </div>
                 <div>
-                  <label for="nom">Cognom</label>
-                  <input type="text" id="nom" placeholder="Cognom" disabled />
+                  <label for="cognom">Cognom</label>
+                  <input type="text" id="cognom" placeholder="Cognom" />
                 </div>
                 <div>
                   <label for="email">Correu electrònic</label>
@@ -79,19 +83,16 @@
                     type="email"
                     id="email"
                     placeholder="usuari@exemple.com"
-                    disabled
                   />
                 </div>
                 <div>
                   <label for="telefon">Telèfon</label>
-                  <input type="text" id="nombre" placeholder="123 456 789" />
+                  <input type="text" id="telefon" placeholder="123 456 789" />
                 </div>
-
                 <div>
                   <label for="password">Contrasenya nova</label>
                   <input type="password" id="password" placeholder="••••••••" />
                 </div>
-
                 <div>
                   <label for="confirmar">Confirmar contrasenya</label>
                   <input
