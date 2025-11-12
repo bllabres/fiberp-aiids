@@ -105,16 +105,18 @@ runWithToken((token) => {
           </thead>
           <tbody>
             ${order.items
-              .map(
-                (item) => `
-              <tr>
-                <td>${item.producte.nom}</td>
-                <td>${item.producte.preu.toFixed(2)} €</td>
-                <td>${item.quantitat}</td>
-                <td>${item.total.toFixed(2)} €</td>
-              </tr>
-            `
-              )
+              .map((item) => {
+                const preu = parseFloat(item.producte.preu) || 0;
+                const total = parseFloat(item.total) || 0;
+                return `
+      <tr>
+        <td>${item.producte.nom}</td>
+        <td>${preu.toFixed(2)} €</td>
+        <td>${item.quantitat}</td>
+        <td>${total.toFixed(2)} €</td>
+      </tr>
+    `;
+              })
               .join("")}
           </tbody>
         </table>
