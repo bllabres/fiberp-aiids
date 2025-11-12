@@ -1,6 +1,5 @@
 function runWithToken(callback) {
-  //const token = localStorage.getItem("token");
-  const token = 1;
+  const token = localStorage.getItem("token");
   if (!token) {
     window.location.href = "login.html";
     return;
