@@ -75,7 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Creant compte...";
-
     try {
       const response = await fetch("http://10.4.41.69:8080/register", {
         method: "POST",

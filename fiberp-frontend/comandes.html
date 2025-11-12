@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ca">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Llista de Comandes</title>
+    <link rel="stylesheet" href="css/style2.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body>
+    <div class="layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-top">
+          <div class="logo">FibERP</div>
+          <button class="toggle-menu" id="menu-btn">
+            <i data-lucide="menu"></i>
+          </button>
+        </div>
+
+        <nav class="menu">
+          <a href="overview.html"><i data-lucide="home"></i> Resum</a>
+          <a href="#"><i data-lucide="shopping-cart"></i> Comandes</a>
+          <a href="product.html"><i data-lucide="package"></i> Fer comanda</a>
+          <a href="#"><i data-lucide="wallet"></i> Finances</a>
+          <a href="#"><i data-lucide="users"></i> RRHH</a>
+          <a href="#"><i data-lucide="shield"></i> Seguretat</a>
+          <a href="perfil.html"><i data-lucide="user"></i> Gestió del compte</a>
+
+          <footer class="sidebar-footer">
+            <button class="logout-btn">
+              <i data-lucide="log-out"></i> Tancar sessió
+            </button>
+          </footer>
+        </nav>
+      </aside>
+
+      <!-- Main content -->
+      <main class="main-content">
+        <header class="page-header">
+          <h1>Llista de Comandes</h1>
+        </header>
+
+        <section class="order-list">
+          <table id="orders-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Estat</th>
+                <th>Total (€)</th>
+                <th>Albarà</th>
+                <th>Nombre de productes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Les comandes es carregaran aquí -->
+            </tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+
+    <script src="js/comandes.js"></script>
+  </body>
+</html>

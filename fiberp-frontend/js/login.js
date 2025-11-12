@@ -70,7 +70,7 @@ form.addEventListener("submit", async function (e) {
     const data = await response.json();
     console.log("Inici de sessió correcte:", data);
     localStorage.setItem("token", data.token);
-    alert("Sessió iniciada correctament!");
+    //alert("Sessió iniciada correctament!");
     window.location.href = "../overview.html";
   } catch (error) {
     console.error("Error d'inici de sessió:", error);

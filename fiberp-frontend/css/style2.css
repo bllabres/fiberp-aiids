@@ -404,3 +404,337 @@ input[readonly]::placeholder {
     font-size: 22px;
   }
 }
+
+/* ==== Productes ==== */
+.products-section {
+  padding: 2rem;
+}
+
+.products-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.product-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.2rem;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.product-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+.product-card img {
+  width: 100%;
+  height: auto;
+  max-height: 220px;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  background: #f9fafb;
+  padding: 0.5rem;
+}
+
+.product-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+}
+
+.product-card p {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+}
+
+.price {
+  display: block;
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 0.8rem;
+}
+
+/* ==== Control de quantitat refinat ==== */
+.quantity-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.3rem 0.6rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  border: none;
+  background: transparent;
+}
+
+.quantity-control:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+/* ==== Botons + i − ==== */
+.qty-btn {
+  background: linear-gradient(145deg, #ffffff, #f1f5f9);
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  color: #1e293b;
+  width: 42px;
+  height: 32px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: none;
+  background: transparent;
+}
+
+.qty-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.25);
+}
+
+.qty-btn:active {
+  transform: scale(0.92);
+}
+
+/* ==== Input de quantitat ==== */
+.qty-input {
+  width: 42px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+  outline: none;
+  height: 32px;
+  line-height: 32px;
+}
+
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* --- 🛒 Estil de la comanda --- */
+.order-section {
+  margin-top: 3rem;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: all 0.3s ease-in-out;
+}
+
+.order-section h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  color: #222;
+  text-align: center;
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  padding: 1rem 0;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.order-item span:first-child {
+  font-weight: 500;
+  color: #333;
+}
+
+.order-item span:last-child {
+  color: #555;
+}
+
+.order-list hr {
+  margin: 1rem 0;
+  border: none;
+  border-top: 1px dashed #ccc;
+}
+
+.order-list p strong {
+  font-size: 1.1rem;
+  color: #222;
+}
+
+/* Botó per confirmar comanda */
+.confirm-btn {
+  display: block;
+  width: 100%;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s;
+}
+
+.confirm-btn:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
+.confirm-btn:active {
+  transform: scale(0.98);
+}
+
+.scroll-btn {
+  display: inline-block;
+  margin: 1rem auto;
+  background: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s;
+}
+
+.scroll-btn:hover {
+  background: #e68900;
+  transform: translateY(-2px);
+}
+
+.scroll-btn:active {
+  transform: scale(0.98);
+}
+
+/* ============================== */
+/*        TAULA DE COMANDES       */
+/* ============================== */
+
+.order-list table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1rem;
+  background-color: #fff;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  font-family: var(--font-family, Inter, ui-sans-serif, system-ui);
+  transition: all 0.3s ease;
+}
+
+/* Capçalera */
+.order-list th {
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Files */
+.order-list td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: #1e293b;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Alterna el color de les files */
+.order-list tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+/* Hover amb efecte subtil */
+.order-list tbody tr:hover {
+  background-color: rgba(79, 70, 229, 0.08); /* blau clar com accent */
+  transform: translateX(2px);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+/* Primera columna destacada (ID) */
+.order-list td:first-child {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .order-list table,
+  .order-list thead,
+  .order-list tbody,
+  .order-list th,
+  .order-list td,
+  .order-list tr {
+    display: block;
+  }
+
+  .order-list thead tr {
+    display: none;
+  }
+
+  .order-list td {
+    padding: 10px;
+    text-align: right;
+    position: relative;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .order-list td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+}
