@@ -18,6 +18,12 @@ runWithToken((token) => {
     console.error("Els elements del DOM no existeixen");
     return;
   }
+  function updateClock() {
+    const now = new Date();
+    clockDiv.textContent = now.toLocaleTimeString("ca-ES", { hour12: false });
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
 
   let fitxaActiva = false;
   let fitxatgeStartTime = null;
@@ -32,15 +38,16 @@ runWithToken((token) => {
 
   function setStatus(msg, type = "info") {
     statusDiv.textContent = msg;
-    statusDiv.classList.remove("success", "error", "blink");
+    statusDiv.classList.remove("success", "error", "info");
 
     if (type === "success") {
-      statusDiv.classList.add("success", "blink");
+      statusDiv.classList.add("success");
     } else if (type === "error") {
       statusDiv.classList.add("error");
+    } else {
+      statusDiv.classList.add("info");
     }
   }
-
   function formatTime(date) {
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
