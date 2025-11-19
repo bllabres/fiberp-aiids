@@ -3,10 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Llista de Comandes</title>
+    <title>Fitxatge</title>
+
     <link rel="stylesheet" href="css/style2.css" />
+    <link rel="stylesheet" href="css/fitxatge.css" />
+
     <script src="https://unpkg.com/lucide@latest"></script>
   </head>
+
   <body>
     <div class="layout">
       <!-- Sidebar -->
@@ -25,7 +29,9 @@
           >
           <a href="product.html"><i data-lucide="package"></i> Fer comanda</a>
           <a href="#"><i data-lucide="wallet"></i> Sou</a>
-          <a href="#"><i data-lucide="users"></i> Fitxatge</a>
+          <a href="fitxatge.html" class="active"
+            ><i data-lucide="users"></i> Fitxatge</a
+          >
           <a href="#"><i data-lucide="shield"></i> Seguretat</a>
           <a href="perfil.html"><i data-lucide="user"></i> Gestió del compte</a>
 
@@ -37,37 +43,24 @@
         </nav>
       </aside>
 
-      <!-- Main content -->
+      <!-- Main -->
       <main class="main-content">
         <header class="page-header">
-          <h1>Llista de Comandes</h1>
+          <div>
+            <h1>Fitxatge</h1>
+            <p class="lead">Control del temps laboral</p>
+          </div>
         </header>
 
-        <section class="order-list">
-          <table id="orders-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Estat</th>
-                <th>Total (€)</th>
-                <th>Albarà</th>
-                <th>Nombre de productes</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Les comandes es carregaran aquí -->
-            </tbody>
-          </table>
-        </section>
-        <section class="order-details-section">
-          <h2>Detalls de la comanda</h2>
-          <div id="orderDetailsContainer">
-            <p>Selecciona una comanda per veure els detalls.</p>
+        <section class="fitxatge-container">
+          <div class="digital-clock" id="clock">00:00:00</div>
+          <div class="button-row">
+            <button class="btn btn-start" id="start">Iniciar fitxatge</button>
+            <button class="btn btn-stop" id="stop">Aturar fitxatge</button>
           </div>
         </section>
       </main>
     </div>
-
-    <script src="js/comandes.js"></script>
+    <script src="js/fitxatge.js"></script>
   </body>
 </html>

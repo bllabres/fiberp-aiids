@@ -1,0 +1,60 @@
+.fitxatge-container {
+  background: rgba(255, 255, 255, 0.85);
+  padding: 40px 50px;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(16, 24, 40, 0.08);
+  text-align: center;
+  margin-top: 40px;
+  backdrop-filter: blur(12px);
+}
+
+.digital-clock {
+  font-size: 70px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #0f172a;
+  letter-spacing: 2px;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn {
+  padding: 14px 20px;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  color: #fff;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.18);
+}
+
+.btn-start {
+  background: #22c55e;
+}
+.btn-stop {
+  background: #ef4444;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(16, 24, 40, 0.2);
+}
+
+#fitxatge-status {
+  color: #0f172a;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.btn.disabled {
+  opacity: 0.6;
+  transform: none;
+  cursor: not-allowed;
+  box-shadow: none;
+}
