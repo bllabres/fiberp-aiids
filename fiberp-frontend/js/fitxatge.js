@@ -10,13 +10,11 @@ function runWithToken(callback) {
 runWithToken((token) => {
   lucide.createIcons();
 
-  // Logout
   document.querySelector(".logout-btn").addEventListener("click", () => {
     localStorage.removeItem("token");
     window.location.href = "login.html";
   });
 
-  // Marcar menú actiu
   const menuLinks = document.querySelectorAll(".menu a");
   const currentPage = window.location.pathname.split("/").pop();
   menuLinks.forEach((link) => {
@@ -28,7 +26,6 @@ runWithToken((token) => {
     if (href === currentPage) link.classList.add("active");
   });
 
-  // Rellotge digital
   function updateClock() {
     const now = new Date();
     document.getElementById("clock").textContent = now.toLocaleTimeString(
@@ -39,25 +36,20 @@ runWithToken((token) => {
   setInterval(updateClock, 1000);
   updateClock();
 
-  // Estat fitxatge
   let fitxaActiva = false;
   const startBtn = document.getElementById("start");
   const stopBtn = document.getElementById("stop");
 
-  // Funció per actualitzar botons segons l'estat
   function updateButtons() {
     if (fitxaActiva) {
-      startBtn.classList.add("disabled");
-      stopBtn.classList.remove("disabled");
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
     } else {
-      startBtn.classList.remove("disabled");
-      stopBtn.classList.add("disabled");
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
     }
   }
 
-  // -----------------------------
-  // Comprovar fitxa activa al carregar
-  // -----------------------------
   async function checkFitxa() {
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
@@ -75,9 +67,6 @@ runWithToken((token) => {
   }
   checkFitxa();
 
-  // -----------------------------
-  // Iniciar fitxatge
-  // -----------------------------
   startBtn.addEventListener("click", async () => {
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
@@ -91,7 +80,8 @@ runWithToken((token) => {
 
       if (res.ok) {
         alert("Fitxatge iniciat!");
-        await checkFitxa(); // << REFRESCA DESPRÉS
+        fitxaActiva = true;
+        updateButtons();
       } else {
         alert(data.error || "Error iniciant fitxatge");
       }
@@ -101,9 +91,6 @@ runWithToken((token) => {
     }
   });
 
-  // -----------------------------
-  // Aturar fitxatge
-  // -----------------------------
   stopBtn.addEventListener("click", async () => {
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
@@ -117,7 +104,8 @@ runWithToken((token) => {
 
       if (res.ok) {
         alert("Fitxatge aturat!");
-        await checkFitxa(); // << REFRESCA DESPRÉS
+        fitxaActiva = false;
+        updateButtons();
       } else {
         alert(data.error || "Error aturant fitxatge");
       }
