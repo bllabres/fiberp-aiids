@@ -91,8 +91,8 @@ runWithToken((token) => {
         },
       });
       const data = await res.json();
+      console.log(res);
       if (res.ok) {
-        console.log(res);
         fitxaActiva = true;
         updateButtons();
         alert("Fitxatge iniciat!");
@@ -120,6 +120,7 @@ runWithToken((token) => {
         },
       });
       const data = await res.json();
+      console.log(res);
       if (res.ok) {
         fitxaActiva = false;
         updateButtons();
