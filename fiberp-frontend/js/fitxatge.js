@@ -11,10 +11,13 @@ runWithToken((token) => {
   lucide.createIcons();
 
   // Logout
-  document.querySelector(".logout-btn").addEventListener("click", () => {
-    localStorage.removeItem("token");
-    window.location.href = "login.html";
-  });
+  const logoutBtn = document.querySelector(".logout-btn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+    });
+  }
 
   // Marcar menú actiu
   const menuLinks = document.querySelectorAll(".menu a");
@@ -31,10 +34,10 @@ runWithToken((token) => {
   // Rellotge digital
   function updateClock() {
     const now = new Date();
-    document.getElementById("clock").textContent = now.toLocaleTimeString(
-      "ca-ES",
-      { hour12: false }
-    );
+    const clockEl = document.getElementById("clock");
+    if (clockEl) {
+      clockEl.textContent = now.toLocaleTimeString("ca-ES", { hour12: false });
+    }
   }
   setInterval(updateClock, 1000);
   updateClock();
@@ -43,20 +46,18 @@ runWithToken((token) => {
   let fitxaActiva = false;
   const startBtn = document.getElementById("start");
   const stopBtn = document.getElementById("stop");
+
   if (!startBtn || !stopBtn) {
     console.error("Els botons de fitxatge no existeixen al DOM");
     return;
   }
 
-  // Funció per actualitzar botons segons l'estat
   function updateButtons() {
     startBtn.disabled = fitxaActiva;
     stopBtn.disabled = !fitxaActiva;
   }
 
-  // -----------------------------
   // Comprovar fitxa activa al carregar
-  // -----------------------------
   async function checkFitxa() {
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
@@ -74,9 +75,7 @@ runWithToken((token) => {
   }
   checkFitxa();
 
-  // -----------------------------
   // Iniciar fitxatge
-  // -----------------------------
   startBtn.addEventListener("click", async () => {
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
@@ -87,10 +86,9 @@ runWithToken((token) => {
         },
       });
       const data = await res.json();
-
       if (res.ok) {
         alert("Fitxatge iniciat!");
-        await checkFitxa(); // REFRESCA ESTAT I BOTONS
+        await checkFitxa();
       } else {
         alert(data.error || "Error iniciant fitxatge");
       }
@@ -100,9 +98,7 @@ runWithToken((token) => {
     }
   });
 
-  // -----------------------------
   // Aturar fitxatge
-  // -----------------------------
   stopBtn.addEventListener("click", async () => {
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
@@ -112,16 +108,10 @@ runWithToken((token) => {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      let data;
-      try {
-        data = await res.json();
-      } catch {
-        data = {};
-      }
+      const data = await res.json();
 
       if (data.status) {
-        alert(data.status);
+        alert(data.status); // Ex: "Fitxatge aturat"
       } else if (data.error) {
         alert(data.error);
       } else {
