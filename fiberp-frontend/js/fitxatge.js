@@ -79,9 +79,6 @@ runWithToken((token) => {
   // Iniciar fitxatge
   // -----------------------------
   startBtn.addEventListener("click", async () => {
-    checkFitxa();
-    updateButtons();
-
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
         method: "POST",
@@ -91,11 +88,10 @@ runWithToken((token) => {
         },
       });
       const data = await res.json();
-      console.log(res);
+
       if (res.ok) {
-        fitxaActiva = true;
-        updateButtons();
         alert("Fitxatge iniciat!");
+        await checkFitxa(); // << REFRESCA DESPRÉS
       } else {
         alert(data.error || "Error iniciant fitxatge");
       }
@@ -109,8 +105,6 @@ runWithToken((token) => {
   // Aturar fitxatge
   // -----------------------------
   stopBtn.addEventListener("click", async () => {
-    checkFitxa();
-    updateButtons();
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
         method: "DELETE",
@@ -120,11 +114,10 @@ runWithToken((token) => {
         },
       });
       const data = await res.json();
-      console.log(res);
+
       if (res.ok) {
-        fitxaActiva = false;
-        updateButtons();
         alert("Fitxatge aturat!");
+        await checkFitxa(); // << REFRESCA DESPRÉS
       } else {
         alert(data.error || "Error aturant fitxatge");
       }
