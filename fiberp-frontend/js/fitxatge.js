@@ -43,6 +43,10 @@ runWithToken((token) => {
   let fitxaActiva = false;
   const startBtn = document.getElementById("start");
   const stopBtn = document.getElementById("stop");
+  if (!startBtn || !stopBtn) {
+    console.error("Els botons de fitxatge no existeixen al DOM");
+    return;
+  }
 
   // Funció per actualitzar botons segons l'estat
   function updateButtons() {
@@ -108,16 +112,23 @@ runWithToken((token) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      const data = await res.json();
 
-      if (res.ok) {
-        alert(
-          data.status ? "Fitxatge aturat!" : data.error || "Acció completada"
-        );
-        await checkFitxa(); // REFRESCA ESTAT I BOTONS
-      } else {
-        alert(data.error || "Error aturant fitxatge");
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
       }
+
+      if (data.status) {
+        alert(data.status);
+      } else if (data.error) {
+        alert(data.error);
+      } else {
+        alert(res.ok ? "Fitxatge aturat" : "Error aturant fitxatge");
+      }
+
+      await checkFitxa();
     } catch (err) {
       console.error(err);
       alert("Error aturant fitxatge");
