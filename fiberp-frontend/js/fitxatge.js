@@ -11,13 +11,10 @@ runWithToken((token) => {
   lucide.createIcons();
 
   // Logout
-  const logoutBtn = document.querySelector(".logout-btn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("token");
-      window.location.href = "login.html";
-    });
-  }
+  document.querySelector(".logout-btn").addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+  });
 
   // Marcar menú actiu
   const menuLinks = document.querySelectorAll(".menu a");
@@ -34,10 +31,10 @@ runWithToken((token) => {
   // Rellotge digital
   function updateClock() {
     const now = new Date();
-    const clockEl = document.getElementById("clock");
-    if (clockEl) {
-      clockEl.textContent = now.toLocaleTimeString("ca-ES", { hour12: false });
-    }
+    document.getElementById("clock").textContent = now.toLocaleTimeString(
+      "ca-ES",
+      { hour12: false }
+    );
   }
   setInterval(updateClock, 1000);
   updateClock();
@@ -46,18 +43,28 @@ runWithToken((token) => {
   let fitxaActiva = false;
   const startBtn = document.getElementById("start");
   const stopBtn = document.getElementById("stop");
+  const statusDiv = document.getElementById("fitxatge-status");
 
-  if (!startBtn || !stopBtn) {
-    console.error("Els botons de fitxatge no existeixen al DOM");
+  if (!startBtn || !stopBtn || !statusDiv) {
+    console.error("Els elements del DOM no existeixen");
     return;
   }
 
   function updateButtons() {
     startBtn.disabled = fitxaActiva;
     stopBtn.disabled = !fitxaActiva;
+
+    startBtn.classList.toggle("disabled", fitxaActiva);
+    stopBtn.classList.toggle("disabled", !fitxaActiva);
   }
 
-  // Comprovar fitxa activa al carregar
+  function setStatus(msg, type = "info") {
+    statusDiv.textContent = msg;
+    statusDiv.style.color =
+      type === "success" ? "#22c55e" : type === "error" ? "#ef4444" : "#0f172a";
+    console.log(msg);
+  }
+
   async function checkFitxa() {
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
@@ -69,8 +76,10 @@ runWithToken((token) => {
       const data = await res.json();
       fitxaActiva = data.active;
       updateButtons();
+      setStatus(data.active ? "Fitxa activa" : "No hi ha fitxa activa", "info");
     } catch (err) {
-      console.error("No s'ha pogut comprovar la fitxa:", err);
+      console.error(err);
+      setStatus("Error comprovant estat fitxa", "error");
     }
   }
   checkFitxa();
@@ -86,15 +95,16 @@ runWithToken((token) => {
         },
       });
       const data = await res.json();
-      if (res.ok) {
-        alert("Fitxatge iniciat!");
+
+      if (data.status) {
+        setStatus("Fitxatge iniciat!", "success");
         await checkFitxa();
       } else {
-        alert(data.error || "Error iniciant fitxatge");
+        setStatus(data.error || "Error iniciant fitxatge", "error");
       }
     } catch (err) {
       console.error(err);
-      alert("Error iniciant fitxatge");
+      setStatus("Error iniciant fitxatge", "error");
     }
   });
 
@@ -108,20 +118,28 @@ runWithToken((token) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
 
       if (data.status) {
-        alert(data.status); // Ex: "Fitxatge aturat"
+        setStatus("Fitxatge aturat!", "success");
       } else if (data.error) {
-        alert(data.error);
+        setStatus(data.error, "error");
       } else {
-        alert(res.ok ? "Fitxatge aturat" : "Error aturant fitxatge");
+        setStatus(
+          res.ok ? "Fitxatge aturat" : "Error aturant fitxatge",
+          "info"
+        );
       }
 
       await checkFitxa();
     } catch (err) {
       console.error(err);
-      alert("Error aturant fitxatge");
+      setStatus("Error aturant fitxatge", "error");
     }
   });
 });
