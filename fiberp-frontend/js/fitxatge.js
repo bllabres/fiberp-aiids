@@ -20,7 +20,7 @@ runWithToken((token) => {
     return;
   }
 
-  // Rellotge gegant
+  // Rellotge digital
   function updateClock() {
     const now = new Date();
     clockDiv.textContent = now.toLocaleTimeString("ca-ES", { hour12: false });
@@ -29,6 +29,7 @@ runWithToken((token) => {
   updateClock();
 
   let fitxaActiva = false;
+  let fitxatgeStartTime = null;
 
   function updateButtons() {
     startBtn.disabled = fitxaActiva;
@@ -47,7 +48,7 @@ runWithToken((token) => {
     else statusDiv.classList.add("info");
   }
 
-  // Agafem només l'hora que envia el servidor (sense ajustar zones horàries)
+  // Funció per obtenir l'hora exacta del servidor
   function formatServerTime(isoString) {
     const match = isoString.match(/T(\d{2}:\d{2}:\d{2})/);
     return match ? match[1] : isoString;
@@ -67,8 +68,8 @@ runWithToken((token) => {
       updateButtons();
 
       if (fitxaActiva && data.history && data.history[0].hora_inici) {
-        const horaServidor = formatServerTime(data.history[0].hora_inici);
-        setStatus(`Fitxatge actiu des de: ${horaServidor}`, "success");
+        fitxatgeStartTime = formatServerTime(data.history[0].hora_inici);
+        setStatus(`Fitxatge actiu des de: ${fitxatgeStartTime}`, "success");
       } else {
         setStatus("No hi ha fitxa activa", "info");
       }
