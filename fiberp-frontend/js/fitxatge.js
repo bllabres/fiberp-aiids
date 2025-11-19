@@ -39,13 +39,15 @@ runWithToken((token) => {
   setInterval(updateClock, 1000);
   updateClock();
 
-  // Estat fitxatge
+  // Fitxatge
   let fitxaActiva = false;
   const startBtn = document.getElementById("start");
   const stopBtn = document.getElementById("stop");
-  const statusDiv = document.getElementById("fitxatge-status");
+  const statusDiv = document.createElement("div");
+  statusDiv.id = "fitxatge-status";
+  startBtn.parentNode.parentNode.insertBefore(statusDiv, startBtn.parentNode);
 
-  if (!startBtn || !stopBtn || !statusDiv) {
+  if (!startBtn || !stopBtn) {
     console.error("Els elements del DOM no existeixen");
     return;
   }
@@ -53,18 +55,32 @@ runWithToken((token) => {
   function updateButtons() {
     startBtn.disabled = fitxaActiva;
     stopBtn.disabled = !fitxaActiva;
-
-    startBtn.classList.toggle("disabled", fitxaActiva);
-    stopBtn.classList.toggle("disabled", !fitxaActiva);
+    startBtn.classList.toggle("disabled", startBtn.disabled);
+    stopBtn.classList.toggle("disabled", stopBtn.disabled);
   }
 
-  function setStatus(msg, type = "info") {
-    statusDiv.textContent = msg;
-    statusDiv.style.color =
-      type === "success" ? "#22c55e" : type === "error" ? "#ef4444" : "#0f172a";
-    console.log(msg);
+  let fitxatgeStartTime = null;
+  let fitxatgeTimer = null;
+
+  function startFitxatgeTimer() {
+    stopFitxatgeTimer();
+    fitxatgeTimer = setInterval(() => {
+      const now = new Date();
+      const diff = Math.floor((now - fitxatgeStartTime) / 1000);
+      const hours = String(Math.floor(diff / 3600)).padStart(2, "0");
+      const minutes = String(Math.floor((diff % 3600) / 60)).padStart(2, "0");
+      const seconds = String(diff % 60).padStart(2, "0");
+      statusDiv.textContent = `Fitxatge actiu: ${hours}:${minutes}:${seconds}`;
+    }, 1000);
   }
 
+  function stopFitxatgeTimer() {
+    if (fitxatgeTimer) clearInterval(fitxatgeTimer);
+    fitxatgeTimer = null;
+    fitxatgeStartTime = null;
+  }
+
+  // Comprovar fitxa activa al carregar
   async function checkFitxa() {
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
@@ -76,10 +92,17 @@ runWithToken((token) => {
       const data = await res.json();
       fitxaActiva = data.active;
       updateButtons();
-      setStatus(data.active ? "Fitxa activa" : "No hi ha fitxa activa", "info");
+
+      if (fitxaActiva && data.history && data.history[0].hora_inici) {
+        fitxatgeStartTime = new Date(data.history[0].hora_inici);
+        startFitxatgeTimer();
+      } else {
+        stopFitxatgeTimer();
+        statusDiv.textContent = "Fitxatge inactiu";
+      }
     } catch (err) {
-      console.error(err);
-      setStatus("Error comprovant estat fitxa", "error");
+      console.error("No s'ha pogut comprovar la fitxa:", err);
+      statusDiv.textContent = "Error carregant fitxatge";
     }
   }
   checkFitxa();
@@ -95,16 +118,15 @@ runWithToken((token) => {
         },
       });
       const data = await res.json();
-
-      if (data.status) {
-        setStatus("Fitxatge iniciat!", "success");
-        await checkFitxa();
+      if (res.ok) {
+        alert("Fitxatge iniciat!");
       } else {
-        setStatus(data.error || "Error iniciant fitxatge", "error");
+        alert(data.error || "Error iniciant fitxatge");
       }
+      await checkFitxa();
     } catch (err) {
       console.error(err);
-      setStatus("Error iniciant fitxatge", "error");
+      alert("Error iniciant fitxatge");
     }
   });
 
@@ -118,28 +140,16 @@ runWithToken((token) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      let data;
-      try {
-        data = await res.json();
-      } catch {
-        data = {};
-      }
-
-      if (data.status) {
-        setStatus("Fitxatge aturat!", "success");
-      } else if (data.error) {
-        setStatus(data.error, "error");
+      const data = await res.json();
+      if (res.ok) {
+        alert("Fitxatge aturat!");
       } else {
-        setStatus(
-          res.ok ? "Fitxatge aturat" : "Error aturant fitxatge",
-          "info"
-        );
+        alert(data.error || "Error aturant fitxatge");
       }
-
       await checkFitxa();
     } catch (err) {
       console.error(err);
-      setStatus("Error aturant fitxatge", "error");
+      alert("Error aturant fitxatge");
     }
   });
 });
