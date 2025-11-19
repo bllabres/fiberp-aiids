@@ -13,6 +13,7 @@ runWithToken((token) => {
   const startBtn = document.getElementById("start");
   const stopBtn = document.getElementById("stop");
   const statusDiv = document.getElementById("fitxatge-status");
+  const clockDiv = document.getElementById("clock");
 
   if (!startBtn || !stopBtn || !statusDiv) {
     console.error("Els elements del DOM no existeixen");
