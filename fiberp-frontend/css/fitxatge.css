@@ -58,3 +58,50 @@
   cursor: not-allowed;
   box-shadow: none;
 }
+
+/* Estat del fitxatge */
+#fitxatge-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  color: #0f172a;
+  background: rgba(37, 99, 235, 0.1); /* fons suau blau */
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  transition: all 0.3s ease;
+  min-width: 220px;
+}
+
+/* Success (fitxatge actiu) */
+#fitxatge-status.success {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #166534;
+}
+
+/* Error */
+#fitxatge-status.error {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #991b1b;
+}
+
+/* Animació lleugera per text */
+#fitxatge-status.blink {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}

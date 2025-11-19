@@ -32,8 +32,13 @@ runWithToken((token) => {
 
   function setStatus(msg, type = "info") {
     statusDiv.textContent = msg;
-    statusDiv.style.color =
-      type === "success" ? "#22c55e" : type === "error" ? "#ef4444" : "#0f172a";
+    statusDiv.classList.remove("success", "error", "blink");
+
+    if (type === "success") {
+      statusDiv.classList.add("success", "blink");
+    } else if (type === "error") {
+      statusDiv.classList.add("error");
+    }
   }
 
   function formatTime(date) {
