@@ -45,6 +45,7 @@ class FitxatgeRepository extends ServiceEntityRepository
         $q = $rep_fitxatge->createQueryBuilder('f')
             ->where('f.usuari = :user')
             ->andWhere('f.hora_inici BETWEEN :inicio AND :fin')
+            ->andWhere('f.hora_fi is NULL')
             ->setParameter('user', $user)
             ->setParameter('inicio', $dataInici)
             ->setParameter('fin', $dataFi)

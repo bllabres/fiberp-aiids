@@ -148,7 +148,7 @@ final class UserController extends AbstractController
         $rep_fitxatge = $em->getRepository(Fitxatge::class);
         $fitxa = $rep_fitxatge->getFitxaActual($user);
         return $this->json([
-            'active' => (bool) $fitxa->getHoraFi() === null,
+            'active' => (bool) $fitxa,
         ]);
     }
 
