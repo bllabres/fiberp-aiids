@@ -1,6 +1,5 @@
 function runWithToken(callback) {
-  //const token = localStorage.getItem("token");
-  const token = 1;
+  const token = localStorage.getItem("token");
   if (!token) {
     window.location.href = "login.html";
     return;
@@ -11,6 +10,7 @@ function runWithToken(callback) {
 runWithToken((token) => {
   lucide.createIcons();
 
+  // Logout
   const logoutBtn = document.querySelector(".logout-btn");
   logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("token");
@@ -21,15 +21,14 @@ runWithToken((token) => {
   const complementsInput = document.getElementById("complements");
   const irpfInput = document.getElementById("irpf_actual");
   const ssInput = document.getElementById("seguretat_social_actual");
-  const guardarBtn = document.getElementById("guardar-sou");
   const statusDiv = document.getElementById("sou-status");
 
   function setStatus(msg, type = "info") {
     statusDiv.textContent = msg;
     statusDiv.className = "";
     statusDiv.classList.add("status-info");
-    if (type === "success") statusDiv.classList.add("success");
-    else if (type === "error") statusDiv.classList.add("error");
+    if (type === "success") statusDiv.classList.add("status-success");
+    else if (type === "error") statusDiv.classList.add("status-error");
   }
 
   async function carregarSou() {
@@ -56,37 +55,6 @@ runWithToken((token) => {
       setStatus("Error carregant dades", "error");
     }
   }
-
-  guardarBtn.addEventListener("click", async () => {
-    const payload = {
-      salari_base: Number(salariBaseInput.value),
-      complements: Number(complementsInput.value),
-      irpf_actual: Number(irpfInput.value),
-      seguretat_social_actual: Number(ssInput.value),
-    };
-
-    try {
-      const res = await fetch("/user/1/sou", {
-        // 1 seria l'ID de l'usuari a editar, canvia segons l'admin
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setStatus("Sou actualitzat correctament", "success");
-      } else {
-        setStatus(data.error || "Error actualitzant el sou", "error");
-      }
-    } catch (err) {
-      console.error(err);
-      setStatus("Error actualitzant el sou", "error");
-    }
-  });
 
   carregarSou();
 });
