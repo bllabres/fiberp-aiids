@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Fitxatge;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -48,11 +49,8 @@ class FitxatgeRepository extends ServiceEntityRepository
             ->setParameter('inicio', $dataInici)
             ->setParameter('fin', $dataFi)
             ->getQuery();
-        $res = $q->getResult();
-        if ($res !== null) {
-            return is_array($res) && count($res) > 0 ? $res[0] : $res;
-        }
-        return false;
+        $res = $q->getOneOrNullResult(AbstractQuery::HYDRATE_OBJECT);
+        return $res ?? false;
     }
 
     //    /**

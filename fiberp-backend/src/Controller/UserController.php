@@ -142,14 +142,15 @@ final class UserController extends AbstractController
     }
 
     #[Route('/user/fitxa', name: 'app_user_get_fitxa', methods: ['GET'])]
-public function getFitxaActual(EntityManagerInterface $em): JsonResponse {
-    $user = $this->getUser();
-    $rep_fitxatge = $em->getRepository(Fitxatge::class);
-    $fitxa = $rep_fitxatge->getFitxaActual($user);
-    return $this->json([
-        'active' => $fitxa ? true : false
-    ]);
-}
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function getFitxaActual(EntityManagerInterface $em): JsonResponse {
+        $user = $this->getUser();
+        $rep_fitxatge = $em->getRepository(Fitxatge::class);
+        $fitxa = $rep_fitxatge->getFitxaActual($user);
+        return $this->json([
+            'active' => (bool) $fitxa
+        ]);
+    }
 
     #[Route('/user/sou', name: 'app_user_sou')]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
