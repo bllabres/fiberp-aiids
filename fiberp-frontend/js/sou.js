@@ -1,5 +1,5 @@
 function runWithToken(callback) {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token"); // Exemple: 1 si no hi ha token real
   if (!token) {
     window.location.href = "login.html";
     return;
@@ -17,20 +17,27 @@ runWithToken((token) => {
     window.location.href = "login.html";
   });
 
-  const salariBaseInput = document.getElementById("salari_base");
-  const complementsInput = document.getElementById("complements");
-  const irpfInput = document.getElementById("irpf_actual");
-  const ssInput = document.getElementById("seguretat_social_actual");
+  // Elements on mostrar les dades de sou
+  const salariBaseEl = document.getElementById("salari_base");
+  const complementsEl = document.getElementById("complements");
+  const irpfEl = document.getElementById("irpf_actual");
+  const ssEl = document.getElementById("seguretat_social_actual");
   const statusDiv = document.getElementById("sou-status");
 
+  // Funció per mostrar missatges d'estat
   function setStatus(msg, type = "info") {
     statusDiv.textContent = msg;
     statusDiv.className = "";
-    statusDiv.classList.add("status-info");
-    if (type === "success") statusDiv.classList.add("status-success");
-    else if (type === "error") statusDiv.classList.add("status-error");
+    statusDiv.classList.add(
+      type === "success"
+        ? "status-success"
+        : type === "error"
+        ? "status-error"
+        : "status-info"
+    );
   }
 
+  // Funció per carregar dades del sou
   async function carregarSou() {
     try {
       const res = await fetch("/user/sou", {
@@ -39,10 +46,10 @@ runWithToken((token) => {
       const data = await res.json();
 
       if (res.ok) {
-        salariBaseInput.value = data.salari_base || 0;
-        complementsInput.value = data.complements || 0;
-        irpfInput.value = data.irpf_actual || 0;
-        ssInput.value = data.seguretat_social_actual || 0;
+        salariBaseEl.textContent = data.salari_base ?? 0;
+        complementsEl.textContent = data.complements ?? 0;
+        irpfEl.textContent = data.irpf_actual ?? 0;
+        ssEl.textContent = data.seguretat_social_actual ?? 0;
         setStatus("Dades de sou carregades", "success");
       } else {
         setStatus(

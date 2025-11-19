@@ -40,37 +40,34 @@
       <main class="main-content">
         <header class="page-header">
           <h1>Sou</h1>
-          <p class="lead">Consulta i actualitza el teu sou</p>
+          <p class="lead">Consulta el teu sou actual</p>
         </header>
+
+        <section class="sou-container">
+          <div class="sou-item">
+            <span class="label">Salari Base (€):</span>
+            <span class="value" id="salari_base">0</span>
+          </div>
+
+          <div class="sou-item">
+            <span class="label">Complements (€):</span>
+            <span class="value" id="complements">0</span>
+          </div>
+
+          <div class="sou-item">
+            <span class="label">IRPF Actual (%):</span>
+            <span class="value" id="irpf_actual">0</span>
+          </div>
+
+          <div class="sou-item">
+            <span class="label">Seguretat Social (%):</span>
+            <span class="value" id="seguretat_social_actual">0</span>
+          </div>
+
+          <div id="sou-status" class="status-info"></div>
+        </section>
       </main>
     </div>
-    <section class="sou-container">
-      <input
-        type="number"
-        id="salari_base"
-        placeholder="Salari Base"
-        readonly
-      />
-      <input
-        type="number"
-        id="complements"
-        placeholder="Complements"
-        readonly
-      />
-      <input
-        type="number"
-        id="irpf_actual"
-        placeholder="IRPF Actual (%)"
-        readonly
-      />
-      <input
-        type="number"
-        id="seguretat_social_actual"
-        placeholder="Seguretat Social (%)"
-        readonly
-      />
-      <div id="sou-status" class="status-info"></div>
-    </section>
 
     <script src="js/sou.js"></script>
   </body>
