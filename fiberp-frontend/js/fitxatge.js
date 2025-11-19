@@ -79,10 +79,9 @@ runWithToken((token) => {
   // Iniciar fitxatge
   // -----------------------------
   startBtn.addEventListener("click", async () => {
-    if (fitxaActiva) {
-      alert("Ja tens una fitxa activa!");
-      return;
-    }
+    checkFitxa();
+    updateButtons();
+
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
         method: "POST",
@@ -109,10 +108,8 @@ runWithToken((token) => {
   // Aturar fitxatge
   // -----------------------------
   stopBtn.addEventListener("click", async () => {
-    if (!fitxaActiva) {
-      alert("No tens cap fitxa activa!");
-      return;
-    }
+    checkFitxa();
+    updateButtons();
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
         method: "DELETE",
