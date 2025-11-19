@@ -20,7 +20,7 @@ runWithToken((token) => {
     return;
   }
 
-  // Rellotge digital gran
+  // Rellotge gegant
   function updateClock() {
     const now = new Date();
     clockDiv.textContent = now.toLocaleTimeString("ca-ES", { hour12: false });
@@ -47,12 +47,10 @@ runWithToken((token) => {
     else statusDiv.classList.add("info");
   }
 
-  // Mostra l'hora tal com ve del servidor sense ajustar zona horària
+  // Agafem només l'hora que envia el servidor (sense ajustar zones horàries)
   function formatServerTime(isoString) {
-    const parts = isoString.split("T");
-    if (parts.length !== 2) return isoString;
-    const time = parts[1].split(".")[0]; // elimina decimals si existeixen
-    return time;
+    const match = isoString.match(/T(\d{2}:\d{2}:\d{2})/);
+    return match ? match[1] : isoString;
   }
 
   async function checkFitxa() {
@@ -91,6 +89,7 @@ runWithToken((token) => {
         },
       });
       const data = await res.json();
+
       if (data.status) {
         await checkFitxa();
       } else {
@@ -112,22 +111,22 @@ runWithToken((token) => {
           Authorization: `Bearer ${token}`,
         },
       });
+
       let data;
       try {
         data = await res.json();
       } catch {
         data = {};
       }
-      if (data.status) {
-        setStatus("Fitxatge aturat", "success");
-      } else if (data.error) {
-        setStatus(data.error, "error");
-      } else {
+
+      if (data.status) setStatus("Fitxatge aturat", "success");
+      else if (data.error) setStatus(data.error, "error");
+      else
         setStatus(
           res.ok ? "Fitxatge aturat" : "Error aturant fitxatge",
           "info"
         );
-      }
+
       await checkFitxa();
     } catch (err) {
       console.error(err);
@@ -135,5 +134,6 @@ runWithToken((token) => {
     }
   });
 
+  // Comprovació inicial
   checkFitxa();
 });
