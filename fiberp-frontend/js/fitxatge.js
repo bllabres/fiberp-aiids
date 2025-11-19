@@ -1,7 +1,8 @@
 function runWithToken(callback) {
-  const token = localStorage.getItem("token");
+  //const token = localStorage.getItem("token");
+  const token = 1;
   if (!token) {
-    window.location.href = "login.html";
+    window.location.href = "http://10.4.41.69:8080/login";
     return;
   }
 
@@ -14,7 +15,7 @@ runWithToken((token) => {
   // Logout
   document.querySelector(".logout-btn").addEventListener("click", () => {
     localStorage.removeItem("token");
-    window.location.href = "login.html";
+    window.location.href = "http://10.4.41.69:8080/login";
   });
 
   // Marcar menú actiu
@@ -40,91 +41,94 @@ runWithToken((token) => {
   setInterval(updateClock, 1000);
   updateClock();
 
-  // Estat de la fitxa i hora d’inici
+  // Estat i hora d’inici
   const statusEl = document.createElement("div");
   statusEl.id = "fitxatge-status";
-  statusEl.textContent = "Fitxa inactiva";
+  document.querySelector(".fitxatge-container").prepend(statusEl);
 
-  const startTimeEl = document.createElement("div");
-  startTimeEl.id = "fitxatge-inici";
-  startTimeEl.style.fontSize = "16px";
-  startTimeEl.style.marginTop = "6px";
-  startTimeEl.textContent = "";
+  const horaIniciEl = document.createElement("div");
+  horaIniciEl.id = "fitxatge-hora-inici";
+  document.querySelector(".fitxatge-container").prepend(horaIniciEl);
 
-  const container = document.querySelector(".fitxatge-container");
-  container.prepend(startTimeEl);
-  container.prepend(statusEl);
+  function updateStatus(fitxaActiva, horaInici = null) {
+    statusEl.textContent = fitxaActiva ? "Fitxa activa" : "Fitxa inactiva";
+    horaIniciEl.textContent = horaInici ? `Hora d'inici: ${horaInici}` : "";
+    document.getElementById("start").disabled = fitxaActiva;
+    document.getElementById("stop").disabled = !fitxaActiva;
+  }
 
-  // Botons
-  const startBtn = document.getElementById("start");
-  const stopBtn = document.getElementById("stop");
-
-  startBtn.classList.remove("disabled");
-  stopBtn.classList.add("disabled");
-
-  // Comprovar fitxa activa al carregar
-  async function checkActiveFitxa() {
+  // Comprovar fitxa activa al carregar la pàgina
+  async function checkFitxa() {
     try {
-      const res = await fetch("/user/fitxa", { method: "GET" });
-      if (!res.ok) return;
+      const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
+        method: "GET",
+        headers: { Accept: "application/json" },
+      });
+
+      if (!res.ok) {
+        updateStatus(false);
+        return;
+      }
+
       const data = await res.json();
-      if (data.horaInici && !data.horaFi) {
-        statusEl.textContent = "Fitxa activa";
-        startBtn.classList.add("disabled");
-        stopBtn.classList.remove("disabled");
-        const hora = new Date(data.horaInici);
-        startTimeEl.textContent = `Inici: ${hora.toLocaleTimeString("ca-ES", {
-          hour12: false,
-        })}`;
+      if (data && data.horaInici) {
+        updateStatus(
+          true,
+          new Date(data.horaInici).toLocaleTimeString("ca-ES", {
+            hour12: false,
+          })
+        );
+      } else {
+        updateStatus(false);
       }
     } catch (err) {
-      console.error("No s'ha pogut comprovar la fitxa activa", err);
+      console.warn("No s'ha pogut comprovar fitxa:", err);
+      updateStatus(false);
     }
   }
 
-  checkActiveFitxa();
+  checkFitxa();
 
-  // Funcions API
-  async function startFitxa() {
+  // Iniciar fitxatge
+  document.getElementById("start").addEventListener("click", async () => {
     try {
-      const res = await fetch("/user/fitxa", { method: "POST" });
-      const data = await res.json();
-      if (res.ok) {
-        statusEl.textContent = "Fitxa activa";
-        startBtn.classList.add("disabled");
-        stopBtn.classList.remove("disabled");
-        const now = new Date();
-        startTimeEl.textContent = `Inici: ${now.toLocaleTimeString("ca-ES", {
-          hour12: false,
-        })}`;
-      } else {
-        alert(data.error || "Error en iniciar la fitxa");
+      const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        alert(errData.error || "Error iniciant fitxatge");
+        return;
       }
+
+      const now = new Date().toLocaleTimeString("ca-ES", { hour12: false });
+      updateStatus(true, now);
     } catch (err) {
       console.error(err);
-      alert("No s'ha pogut connectar amb el servidor");
+      alert("No s'ha pogut iniciar fitxatge");
     }
-  }
+  });
 
-  async function stopFitxa() {
+  // Aturar fitxatge
+  document.getElementById("stop").addEventListener("click", async () => {
     try {
-      const res = await fetch("/user/fitxa", { method: "DELETE" });
-      const data = await res.json();
-      if (res.ok) {
-        statusEl.textContent = "Fitxa inactiva";
-        startBtn.classList.remove("disabled");
-        stopBtn.classList.add("disabled");
-        startTimeEl.textContent = "";
-      } else {
-        alert(data.error || "Error en aturar la fitxa");
+      const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        alert(errData.error || "Error aturant fitxatge");
+        return;
       }
+
+      updateStatus(false);
     } catch (err) {
       console.error(err);
-      alert("No s'ha pogut connectar amb el servidor");
+      alert("No s'ha pogut aturar fitxatge");
     }
-  }
-
-  // Assignar events
-  startBtn.addEventListener("click", startFitxa);
-  stopBtn.addEventListener("click", stopFitxa);
+  });
 });
