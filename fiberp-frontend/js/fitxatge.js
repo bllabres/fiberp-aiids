@@ -20,7 +20,7 @@ runWithToken((token) => {
     return;
   }
 
-  // Rellotge digital
+  // Rellotge gegant
   function updateClock() {
     const now = new Date();
     clockDiv.textContent = now.toLocaleTimeString("ca-ES", { hour12: false });
@@ -29,7 +29,6 @@ runWithToken((token) => {
   updateClock();
 
   let fitxaActiva = false;
-  let fitxatgeStartTime = null;
 
   function updateButtons() {
     startBtn.disabled = fitxaActiva;
@@ -43,15 +42,28 @@ runWithToken((token) => {
     statusDiv.textContent = msg;
     statusDiv.classList.remove("success", "error", "info");
 
-    if (type === "success") statusDiv.classList.add("success");
-    else if (type === "error") statusDiv.classList.add("error");
-    else statusDiv.classList.add("info");
+    if (type === "success") {
+      statusDiv.classList.add("success");
+    } else if (type === "error") {
+      statusDiv.classList.add("error");
+    } else {
+      statusDiv.classList.add("info");
+    }
   }
 
-  // Funció per obtenir l'hora exacta del servidor
-  function formatServerTime(isoString) {
-    const match = isoString.match(/T(\d{2}:\d{2}:\d{2})/);
-    return match ? match[1] : isoString;
+  function formatServerTimePlusOneHour(isoString) {
+    const match = isoString.match(/T(\d{2}):(\d{2}):(\d{2})/);
+    if (!match) return isoString;
+
+    let hours = parseInt(match[1], 10);
+    const minutes = match[2];
+    const seconds = match[3];
+
+    // Sumem una hora manualment
+    hours = (hours + 1) % 24;
+    const hoursStr = String(hours).padStart(2, "0");
+
+    return `${hoursStr}:${minutes}:${seconds}`;
   }
 
   async function checkFitxa() {
@@ -68,7 +80,9 @@ runWithToken((token) => {
       updateButtons();
 
       if (fitxaActiva && data.history && data.history[0].hora_inici) {
-        fitxatgeStartTime = formatServerTime(data.history[0].hora_inici);
+        const fitxatgeStartTime = formatServerTimePlusOneHour(
+          data.history[0].hora_inici
+        );
         setStatus(`Fitxatge actiu des de: ${fitxatgeStartTime}`, "success");
       } else {
         setStatus("No hi ha fitxa activa", "info");
@@ -120,13 +134,16 @@ runWithToken((token) => {
         data = {};
       }
 
-      if (data.status) setStatus("Fitxatge aturat", "success");
-      else if (data.error) setStatus(data.error, "error");
-      else
+      if (data.status) {
+        setStatus("Fitxatge aturat", "success");
+      } else if (data.error) {
+        setStatus(data.error, "error");
+      } else {
         setStatus(
           res.ok ? "Fitxatge aturat" : "Error aturant fitxatge",
           "info"
         );
+      }
 
       await checkFitxa();
     } catch (err) {
