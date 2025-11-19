@@ -1,6 +1,5 @@
 function runWithToken(callback) {
-  //const token = localStorage.getItem("token");
-  const token = 1;
+  const token = localStorage.getItem("token");
   if (!token) {
     window.location.href = "http://10.4.41.69:8080/login";
     return;
@@ -94,7 +93,10 @@ runWithToken((token) => {
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) {
@@ -116,7 +118,10 @@ runWithToken((token) => {
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) {
