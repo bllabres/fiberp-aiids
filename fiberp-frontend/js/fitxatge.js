@@ -15,10 +15,12 @@ runWithToken((token) => {
   const statusDiv = document.getElementById("fitxatge-status");
   const clockDiv = document.getElementById("clock");
 
-  if (!startBtn || !stopBtn || !statusDiv) {
+  if (!startBtn || !stopBtn || !statusDiv || !clockDiv) {
     console.error("Els elements del DOM no existeixen");
     return;
   }
+
+  // Rellotge digital gran
   function updateClock() {
     const now = new Date();
     clockDiv.textContent = now.toLocaleTimeString("ca-ES", { hour12: false });
@@ -27,7 +29,6 @@ runWithToken((token) => {
   updateClock();
 
   let fitxaActiva = false;
-  let fitxatgeStartTime = null;
 
   function updateButtons() {
     startBtn.disabled = fitxaActiva;
@@ -41,19 +42,17 @@ runWithToken((token) => {
     statusDiv.textContent = msg;
     statusDiv.classList.remove("success", "error", "info");
 
-    if (type === "success") {
-      statusDiv.classList.add("success");
-    } else if (type === "error") {
-      statusDiv.classList.add("error");
-    } else {
-      statusDiv.classList.add("info");
-    }
+    if (type === "success") statusDiv.classList.add("success");
+    else if (type === "error") statusDiv.classList.add("error");
+    else statusDiv.classList.add("info");
   }
-  function formatTime(date) {
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-    return `${hours}:${minutes}:${seconds}`;
+
+  // Mostra l'hora tal com ve del servidor sense ajustar zona horària
+  function formatServerTime(isoString) {
+    const parts = isoString.split("T");
+    if (parts.length !== 2) return isoString;
+    const time = parts[1].split(".")[0]; // elimina decimals si existeixen
+    return time;
   }
 
   async function checkFitxa() {
@@ -70,15 +69,8 @@ runWithToken((token) => {
       updateButtons();
 
       if (fitxaActiva && data.history && data.history[0].hora_inici) {
-        fitxatgeStartTime = new Date(data.history[0].hora_inici);
-        if (!isNaN(fitxatgeStartTime)) {
-          setStatus(
-            `Fitxatge actiu des de: ${formatTime(fitxatgeStartTime)}`,
-            "success"
-          );
-        } else {
-          setStatus("Fitxatge actiu, hora no vàlida", "error");
-        }
+        const horaServidor = formatServerTime(data.history[0].hora_inici);
+        setStatus(`Fitxatge actiu des de: ${horaServidor}`, "success");
       } else {
         setStatus("No hi ha fitxa activa", "info");
       }
@@ -99,7 +91,6 @@ runWithToken((token) => {
         },
       });
       const data = await res.json();
-
       if (data.status) {
         await checkFitxa();
       } else {
@@ -121,14 +112,12 @@ runWithToken((token) => {
           Authorization: `Bearer ${token}`,
         },
       });
-
       let data;
       try {
         data = await res.json();
       } catch {
         data = {};
       }
-
       if (data.status) {
         setStatus("Fitxatge aturat", "success");
       } else if (data.error) {
@@ -139,7 +128,6 @@ runWithToken((token) => {
           "info"
         );
       }
-
       await checkFitxa();
     } catch (err) {
       console.error(err);
@@ -147,6 +135,5 @@ runWithToken((token) => {
     }
   });
 
-  // Comprovació inicial
   checkFitxa();
 });
