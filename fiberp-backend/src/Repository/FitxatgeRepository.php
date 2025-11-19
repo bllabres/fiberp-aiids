@@ -18,40 +18,61 @@ class FitxatgeRepository extends ServiceEntityRepository
         parent::__construct($registry, Fitxatge::class);
     }
 
+    // public function hasOneActive(User $user): bool
+    // {
+    //     $entityManager = $this->getEntityManager();
+    //     $rep_fitxatge = $entityManager->getRepository(Fitxatge::class);
+    //     $dataInici = (new \DateTime('today'))->setTime(0, 0, 0);
+    //     $dataFi = (new \DateTime('today'))->setTime(23, 59, 59);
+
+    //     $q = $rep_fitxatge->createQueryBuilder('f')
+    //         ->where('f.usuari = :user')
+    //          ->andWhere('f.hora_fi IS NULL')
+    //         ->setParameter('user', $user)
+    //         ->setParameter('inicio', $dataInici)
+    //         ->setParameter('fin', $dataFi)
+    //         ->getQuery();
+    //     $res = $q->getResult();
+    //     return count($res) > 0;
+    // }
     public function hasOneActive(User $user): bool
+{
+    return (bool) $this->createQueryBuilder('f')
+        ->select('COUNT(f.id)')
+        ->where('f.usuari = :user')
+        ->andWhere('f.hora_fi IS NULL')
+        ->setParameter('user', $user)
+        ->getQuery()
+        ->getSingleScalarResult();
+}
+
+    // public function getFitxaActual(User $user): bool|Fitxatge {
+    //     $entityManager = $this->getEntityManager();
+    //     $rep_fitxatge = $entityManager->getRepository(Fitxatge::class);
+    //     $dataInici = (new \DateTime('today'))->setTime(0, 0, 0);
+    //     $dataFi = (new \DateTime('today'))->setTime(23, 59, 59);
+
+    //     $q = $rep_fitxatge->createQueryBuilder('f')
+    //         ->where('f.usuari = :user')
+    //         ->andWhere('f.hora_inici BETWEEN :inicio AND :fin')
+    //         ->andWhere('f.hora_fi is NULL')
+    //         ->setParameter('user', $user)
+    //         ->setParameter('inicio', $dataInici)
+    //         ->setParameter('fin', $dataFi)
+    //         ->getQuery();
+    //     $res = $q->getOneOrNullResult(AbstractQuery::HYDRATE_OBJECT);
+    //     return $res ?? false;
+    // }
+
+    public function getFitxaActual(User $user): ?Fitxatge
     {
-        $entityManager = $this->getEntityManager();
-        $rep_fitxatge = $entityManager->getRepository(Fitxatge::class);
-        $dataInici = (new \DateTime('today'))->setTime(0, 0, 0);
-        $dataFi = (new \DateTime('today'))->setTime(23, 59, 59);
-
-        $q = $rep_fitxatge->createQueryBuilder('f')
+        return $this->createQueryBuilder('f')
             ->where('f.usuari = :user')
-            ->andWhere('f.hora_inici BETWEEN :inicio AND :fin')
+            ->andWhere('f.hora_fi IS NULL')
             ->setParameter('user', $user)
-            ->setParameter('inicio', $dataInici)
-            ->setParameter('fin', $dataFi)
-            ->getQuery();
-        $res = $q->getResult();
-        return count($res) > 0;
-    }
-
-    public function getFitxaActual(User $user): bool|Fitxatge {
-        $entityManager = $this->getEntityManager();
-        $rep_fitxatge = $entityManager->getRepository(Fitxatge::class);
-        $dataInici = (new \DateTime('today'))->setTime(0, 0, 0);
-        $dataFi = (new \DateTime('today'))->setTime(23, 59, 59);
-
-        $q = $rep_fitxatge->createQueryBuilder('f')
-            ->where('f.usuari = :user')
-            ->andWhere('f.hora_inici BETWEEN :inicio AND :fin')
-            ->andWhere('f.hora_fi is NULL')
-            ->setParameter('user', $user)
-            ->setParameter('inicio', $dataInici)
-            ->setParameter('fin', $dataFi)
-            ->getQuery();
-        $res = $q->getOneOrNullResult(AbstractQuery::HYDRATE_OBJECT);
-        return $res ?? false;
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     //    /**
