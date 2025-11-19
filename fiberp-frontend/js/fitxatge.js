@@ -111,7 +111,9 @@ runWithToken((token) => {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Fitxatge aturat!");
+        alert(
+          data.status ? "Fitxatge aturat!" : data.error || "Acció completada"
+        );
         await checkFitxa(); // REFRESCA ESTAT I BOTONS
       } else {
         alert(data.error || "Error aturant fitxatge");
