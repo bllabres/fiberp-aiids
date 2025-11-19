@@ -40,7 +40,7 @@ runWithToken((token) => {
   // Funció per carregar dades del sou
   async function carregarSou() {
     try {
-      const res = await fetch("/user/sou", {
+      const res = await fetch("http://10.4.41.69:8080/user/sou", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
