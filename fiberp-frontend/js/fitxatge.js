@@ -41,29 +41,17 @@ runWithToken((token) => {
   function setStatus(msg, type = "info") {
     statusDiv.textContent = msg;
     statusDiv.classList.remove("success", "error", "info");
-
-    if (type === "success") {
-      statusDiv.classList.add("success");
-    } else if (type === "error") {
-      statusDiv.classList.add("error");
-    } else {
-      statusDiv.classList.add("info");
-    }
+    statusDiv.style.color =
+      type === "success" ? "#22c55e" : type === "error" ? "#ef4444" : "#0f172a";
+    statusDiv.style.fontWeight = "600";
+    statusDiv.style.fontSize = "16px";
+    statusDiv.style.marginBottom = "15px";
   }
 
-  function formatServerTimePlusOneHour(isoString) {
-    const match = isoString.match(/T(\d{2}):(\d{2}):(\d{2})/);
-    if (!match) return isoString;
-
-    let hours = parseInt(match[1], 10);
-    const minutes = match[2];
-    const seconds = match[3];
-
-    // Sumem una hora manualment
-    hours = (hours + 1) % 24;
-    const hoursStr = String(hours).padStart(2, "0");
-
-    return `${hoursStr}:${minutes}:${seconds}`;
+  function formatTimePlusOneHour(isoString) {
+    const d = new Date(isoString);
+    d.setHours(d.getHours() + 1); // sumem 1 hora manualment
+    return d.toLocaleTimeString("ca-ES", { hour12: false });
   }
 
   async function checkFitxa() {
@@ -80,10 +68,8 @@ runWithToken((token) => {
       updateButtons();
 
       if (fitxaActiva && data.history && data.history[0].hora_inici) {
-        const fitxatgeStartTime = formatServerTimePlusOneHour(
-          data.history[0].hora_inici
-        );
-        setStatus(`Fitxatge actiu des de: ${fitxatgeStartTime}`, "success");
+        const horaInici = formatTimePlusOneHour(data.history[0].hora_inici);
+        setStatus(`Fitxatge actiu des de: ${horaInici}`, "success");
       } else {
         setStatus("No hi ha fitxa activa", "info");
       }
@@ -93,7 +79,6 @@ runWithToken((token) => {
     }
   }
 
-  // Iniciar fitxatge
   startBtn.addEventListener("click", async () => {
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
@@ -104,19 +89,14 @@ runWithToken((token) => {
         },
       });
       const data = await res.json();
-
-      if (data.status) {
-        await checkFitxa();
-      } else {
-        setStatus(data.error || "Error iniciant fitxatge", "error");
-      }
+      if (data.status) await checkFitxa();
+      else setStatus(data.error || "Error iniciant fitxatge", "error");
     } catch (err) {
       console.error(err);
       setStatus("Error iniciant fitxatge", "error");
     }
   });
 
-  // Aturar fitxatge
   stopBtn.addEventListener("click", async () => {
     try {
       const res = await fetch("http://10.4.41.69:8080/user/fitxa", {
@@ -126,7 +106,6 @@ runWithToken((token) => {
           Authorization: `Bearer ${token}`,
         },
       });
-
       let data;
       try {
         data = await res.json();
@@ -134,16 +113,13 @@ runWithToken((token) => {
         data = {};
       }
 
-      if (data.status) {
-        setStatus("Fitxatge aturat", "success");
-      } else if (data.error) {
-        setStatus(data.error, "error");
-      } else {
+      if (data.status) setStatus("Fitxatge aturat", "success");
+      else if (data.error) setStatus(data.error, "error");
+      else
         setStatus(
           res.ok ? "Fitxatge aturat" : "Error aturant fitxatge",
           "info"
         );
-      }
 
       await checkFitxa();
     } catch (err) {
@@ -152,6 +128,5 @@ runWithToken((token) => {
     }
   });
 
-  // Comprovació inicial
   checkFitxa();
 });
