@@ -139,21 +139,31 @@ final class UserController extends AbstractController
         $em->persist($fitxa);
         $em->flush();
         return $this->json([
-            'status' => 'succcess'
+            'status' => 'success'
         ]);
     }
 
     #[Route('/user/fitxa', name: 'app_user_get_fitxa', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    public function getFitxaActual(EntityManagerInterface $em): JsonResponse {
-        $user = $this->getUser();
-        $rep_fitxatge = $em->getRepository(Fitxatge::class);
-        $fitxa = $rep_fitxatge->getFitxaActual($user);
-        return $this->json([
-            'active' => (bool) $fitxa,
-            'history' => $rep_fitxatge->findBy(['usuari' => $user], ['hora_inici' => 'DESC'], 10)
-        ]);
-    }
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
+public function getFitxaActual(EntityManagerInterface $em): JsonResponse {
+    $user = $this->getUser();
+    $rep_fitxatge = $em->getRepository(Fitxatge::class);
+    $fitxa = $rep_fitxatge->getFitxaActual($user);
+
+    // Agafem només els camps que volem serialitzar
+    $history = array_map(function(Fitxatge $f) {
+        return [
+            'id' => $f->getId(),
+            'hora_inici' => $f->getHoraInici()?->format('Y-m-d H:i:s'),
+            'hora_fi' => $f->getHoraFi()?->format('Y-m-d H:i:s'),
+        ];
+    }, $rep_fitxatge->findBy(['usuari' => $user], ['hora_inici' => 'DESC'], 10));
+
+    return $this->json([
+        'active' => (bool) $fitxa,
+        'history' => $history,
+    ]);
+}
 
     #[Route('/user/sou', name: 'app_user_sou')]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
