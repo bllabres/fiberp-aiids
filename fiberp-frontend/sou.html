@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ca">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestió de Sous</title>
+    <link rel="stylesheet" href="css/style2.css" />
+    <link rel="stylesheet" href="css/sou.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body>
+    <div class="layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-top">
+          <div class="logo">FibERP</div>
+          <button class="toggle-menu" id="menu-btn">
+            <i data-lucide="menu"></i>
+          </button>
+        </div>
+        <nav class="menu">
+          <a href="overview.html"><i data-lucide="home"></i> Resum</a>
+          <a href="comandes.html"
+            ><i data-lucide="shopping-cart"></i> Comandes</a
+          >
+          <a href="product.html"><i data-lucide="package"></i> Fer comanda</a>
+          <a href="#"><i data-lucide="wallet"></i> Sou</a>
+          <a href="fitxatge.html"><i data-lucide="users"></i> Fitxatge</a>
+          <a href="#"><i data-lucide="shield"></i> Seguretat</a>
+          <a href="perfil.html"><i data-lucide="user"></i> Gestió del compte</a>
+          <footer class="sidebar-footer">
+            <button class="logout-btn">
+              <i data-lucide="log-out"></i> Tancar sessió
+            </button>
+          </footer>
+        </nav>
+      </aside>
+
+      <!-- Main -->
+      <main class="main-content">
+        <header class="page-header">
+          <h1>Gestió de Sous</h1>
+          <p class="lead">Editar els sous dels usuaris</p>
+        </header>
+
+        <section class="sou-container">
+          <table id="users-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Salari Base</th>
+                <th>Accions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+
+    <!-- Modal per editar sou -->
+    <div class="modal" id="sou-modal">
+      <div class="modal-content">
+        <h2>Editar Sou</h2>
+        <form id="sou-form">
+          <label
+            >Salari Base:
+            <input type="number" step="0.01" name="salari_base" required
+          /></label>
+          <label
+            >Complements: <input type="number" step="0.01" name="complements"
+          /></label>
+          <label
+            >IRPF: <input type="number" step="0.01" name="irpf_actual"
+          /></label>
+          <label
+            >Seguretat Social:
+            <input type="number" step="0.01" name="seguretat_social_actual"
+          /></label>
+          <div class="modal-buttons">
+            <button type="submit" class="btn btn-start">Guardar</button>
+            <button type="button" class="btn btn-stop" id="close-modal">
+              Tancar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="js/sou.js"></script>
+  </body>
+</html>
