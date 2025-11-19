@@ -123,7 +123,7 @@ final class UserController extends AbstractController
         $fitxa->setHoraInici(new DateTime('now'));
         $em->persist($fitxa);
         $em->flush();
-        return $this->json([['status' => 'succcess']]);
+        return $this->json(['status' => 'succcess']);
     }
 
     #[Route('/user/fitxa', name: 'app_user_delete_fitxa', methods: ['DELETE'])]
@@ -138,7 +138,9 @@ final class UserController extends AbstractController
         $fitxa->setHoraFi(new DateTime('now'));
         $em->persist($fitxa);
         $em->flush();
-        return $this->json([['status' => 'succcess']]);
+        return $this->json([
+            'status' => 'succcess'
+        ]);
     }
 
     #[Route('/user/fitxa', name: 'app_user_get_fitxa', methods: ['GET'])]
@@ -149,6 +151,7 @@ final class UserController extends AbstractController
         $fitxa = $rep_fitxatge->getFitxaActual($user);
         return $this->json([
             'active' => (bool) $fitxa,
+            'history' => $rep_fitxatge->findBy(['usuari' => $user], ['hora_inici' => 'DESC'], 10)
         ]);
     }
 
