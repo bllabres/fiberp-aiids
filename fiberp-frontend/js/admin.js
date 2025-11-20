@@ -1,31 +1,34 @@
 document.addEventListener("DOMContentLoaded", () => {
   lucide.createIcons();
 
-  const token = localStorage.getItem("token");
-  if (!token) window.location = "login.html";
-
-  /** 🔐 Comprovar que l’usuari és ADMIN */
-  async function checkAdmin() {
-    try {
-      const res = await fetch("http://10.4.41.69:8080/user", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error();
-
-      const user = await res.json();
-      if (!user.roles.includes("ROLE_ADMIN")) {
-        alert("❌ No tens permisos per accedir a aquesta pàgina.");
-        window.location = "overview.html";
-      }
-    } catch (e) {
-      window.location = "login.html";
-    }
-  }
-
-  checkAdmin();
-
-  /** 📌 Variables UI */
   const tbody = document.querySelector("#sou-table tbody");
+
+  // 🔹 Dades d'exemple (TOTS amb telèfon i rol)
+  const empleats = [
+    {
+      id: 1,
+      nom: "Joan Pérez",
+      email: "joan.perez@test.local",
+      telefon: "634 456 789",
+      rol: "ROLE_USER",
+    },
+    {
+      id: 2,
+      nom: "Maria López",
+      email: "maria.lopez@test.local",
+      telefon: "611 298 456",
+      rol: "ROLE_USER",
+    },
+    {
+      id: 3,
+      nom: "Carlos Sánchez",
+      email: "carlos.sanchez@test.local",
+      telefon: "622 788 801",
+      rol: "ROLE_ADMIN",
+    },
+  ];
+
+  // 🔹 Elements panell edició
   const editPanel = document.getElementById("edit-panel");
   const nomEl = document.getElementById("empleat-nom");
   const salariInput = document.getElementById("edit-salari");
@@ -35,116 +38,61 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveBtn = document.getElementById("save-btn");
   const cancelBtn = document.getElementById("cancel-btn");
 
-  let currentUser = null;
+  let currentEmpleat = null;
 
-  /** 🔹 1) Carregar usuaris */
-  async function fetchUsers() {
-    try {
-      const res = await fetch("http://10.4.41.69:8080/user", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) throw new Error("Error carregant usuaris");
-      const users = await res.json();
-      renderUsers(users);
-    } catch (e) {
-      tbody.innerHTML = `<tr><td colspan="9" style="color:red;text-align:center;">${e.message}</td></tr>`;
-    }
-  }
-
-  /** 🔹 2) Renderitzar usuaris a la taula */
-  function renderUsers(users) {
-    tbody.innerHTML = users
+  // 🔹 Renderitzar taula
+  function renderTable() {
+    tbody.innerHTML = empleats
       .map(
-        (u) => `
-        <tr data-id="${u.id}">
-          <td>${u.id}</td>
-          <td>${u.name}</td>
-          <td>${u.email}</td>
-          <td>${u.telefon || "-"}</td>
-          <td>${u.roles.join(", ")}</td>
-        </tr>
-      `
+        (emp) => `
+      <tr data-id="${emp.id}">
+        <td>${emp.id}</td>
+        <td>${emp.nom}</td>
+        <td>${emp.email}</td>
+        <td>${emp.telefon}</td>
+        <td>${emp.rol}</td>
+        
+      </tr>
+    `
       )
       .join("");
 
+    // Afegir click per editar
     tbody.querySelectorAll("tr").forEach((row) => {
-      row.addEventListener("click", () => openSalaryPanel(row.dataset.id));
+      row.addEventListener("click", () => {
+        const id = Number(row.dataset.id);
+        currentEmpleat = empleats.find((e) => e.id === id);
+        if (!currentEmpleat) return;
+
+        nomEl.textContent = currentEmpleat.nom;
+        salariInput.value = currentEmpleat.salari_base;
+        complementsInput.value = currentEmpleat.complements;
+        irpfInput.value = currentEmpleat.irpf;
+        ssInput.value = currentEmpleat.ss;
+
+        editPanel.classList.add("visible");
+      });
     });
   }
 
-  /** 🔹 3) Obrir panell sou */
-  async function openSalaryPanel(id) {
-    currentUser = id;
+  renderTable();
 
-    try {
-      const resUser = await fetch(`http://10.4.41.69:8080/user/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const userData = await resUser.json();
-      nomEl.textContent = userData.name;
+  // 🔹 Guardar canvis al panell
+  saveBtn.addEventListener("click", () => {
+    if (!currentEmpleat) return;
 
-      const res = await fetch(`http://10.4.41.69:8080/user/${id}/sou`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+    currentEmpleat.salari_base = Number(salariInput.value);
+    currentEmpleat.complements = Number(complementsInput.value);
+    currentEmpleat.irpf = Number(irpfInput.value);
+    currentEmpleat.ss = Number(ssInput.value);
 
-      if (!res.ok) {
-        salariInput.value = "";
-        complementsInput.value = "";
-        irpfInput.value = "";
-        ssInput.value = "";
-      } else {
-        const sou = await res.json();
-        salariInput.value = sou.salari_base;
-        complementsInput.value = sou.complements;
-        irpfInput.value = sou.irpf_actual;
-        ssInput.value = sou.seguretat_social_actual;
-      }
-
-      editPanel.classList.add("visible");
-    } catch (e) {
-      alert("Error carregant sou");
-    }
-  }
-
-  /** 🔹 4) Guardar canvis */
-  saveBtn.addEventListener("click", async () => {
-    if (!currentUser) return;
-
-    try {
-      const res = await fetch(
-        `http://10.4.41.69:8080/user/${currentUser}/sou`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            salari_base: Number(salariInput.value),
-            complements: Number(complementsInput.value),
-            irpf_actual: Number(irpfInput.value),
-            seguretat_social_actual: Number(ssInput.value),
-          }),
-        }
-      );
-
-      if (!res.ok) throw new Error("Error guardant sou");
-
-      alert("Sou actualitzat correctament");
-      editPanel.classList.remove("visible");
-      fetchUsers();
-    } catch (e) {
-      alert(e.message);
-    }
+    renderTable();
+    editPanel.classList.remove("visible");
   });
 
-  /** 🔹 5) Cancel·lar edició */
+  // 🔹 Cancel·lar edició
   cancelBtn.addEventListener("click", () => {
     editPanel.classList.remove("visible");
-    currentUser = null;
+    currentEmpleat = null;
   });
-
-  /** 🚀 Inicialitzar llista */
-  fetchUsers();
 });
