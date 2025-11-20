@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sou de l'usuari</title>
+    <title>Gestió de Sou - Admin</title>
     <link rel="stylesheet" href="css/style2.css" />
     <link rel="stylesheet" href="css/fitxatge.css" />
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -18,7 +18,6 @@
             <i data-lucide="menu"></i>
           </button>
         </div>
-
         <nav class="menu">
           <a href="overview.html"><i data-lucide="home"></i> Resum</a>
           <a href="comandes.html"
@@ -27,7 +26,6 @@
           <a href="product.html"><i data-lucide="package"></i> Fer comanda</a>
           <a href="#"><i data-lucide="wallet"></i> Sou</a>
           <a href="fitxatge.html"><i data-lucide="users"></i> Fitxatge</a>
-          <a href="admin.html"><i data-lucide="shield"></i> Admin</a>
           <a href="perfil.html"><i data-lucide="user"></i> Gestió del compte</a>
           <footer class="sidebar-footer">
             <button class="logout-btn">
@@ -40,36 +38,45 @@
       <!-- Main -->
       <main class="main-content">
         <header class="page-header">
-          <h1>Sou</h1>
-          <p class="lead">Consulta el teu sou actual</p>
+          <h1>Gestió de Sous</h1>
+          <p class="lead">Només admin pot modificar els sous dels empleats</p>
         </header>
 
-        <section class="sou-container">
-          <div class="sou-item">
-            <span class="label">Salari Base (€):</span>
-            <span class="value" id="salari_base">0</span>
-          </div>
-
-          <div class="sou-item">
-            <span class="label">Complements (€):</span>
-            <span class="value" id="complements">0</span>
-          </div>
-
-          <div class="sou-item">
-            <span class="label">IRPF Actual (%):</span>
-            <span class="value" id="irpf_actual">0</span>
-          </div>
-
-          <div class="sou-item">
-            <span class="label">Seguretat Social (%):</span>
-            <span class="value" id="seguretat_social_actual">0</span>
-          </div>
-
-          <div id="sou-status" class="status-info"></div>
+        <section class="order-list">
+          <table id="sou-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Telèfon</th>
+                <th>Rol</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Les files es carregaran aquí -->
+            </tbody>
+          </table>
         </section>
+        <div id="edit-panel" class="edit-panel hidden">
+          <h2>Editar Sou</h2>
+          <p id="empleat-nom"></p>
+          <label>Salari Base (€):</label>
+          <input type="number" id="edit-salari" />
+          <label>Complements (€):</label>
+          <input type="number" id="edit-complements" />
+          <label>IRPF (%):</label>
+          <input type="number" id="edit-irpf" />
+          <label>Seguretat Social (%):</label>
+          <input type="number" id="edit-ss" />
+          <div class="panel-buttons">
+            <button id="save-btn">Guardar</button>
+            <button id="cancel-btn">Cancelar</button>
+          </div>
+        </div>
       </main>
     </div>
 
-    <script src="js/sou.js"></script>
+    <script src="js/admin.js"></script>
   </body>
 </html>
