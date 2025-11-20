@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     setTimeout(() => {
       toast.classList.remove("show");
-    }, 2000);
+    }, 3000);
   }
 
   /** ▶️ Inici */
