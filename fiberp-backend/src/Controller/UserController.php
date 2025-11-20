@@ -27,6 +27,34 @@ final class UserController extends AbstractController
         $this->logger = $logger;
     }
 
+    #[Route('/users', name: 'app_users_list', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function listUsers(EntityManagerInterface $em): JsonResponse
+    {
+        $users = $em->getRepository(User::class)->findAll();
+        $userData = array_map(function (User $user) {
+            $sou = $user->getSou();
+            return [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'name' => $user->getName(),
+                'telefon' => $user->getTelefon(),
+                'roles' => $user->getRoles(),
+                'createdAt' => $user->getCreatedAt()->format('Y-m-d H:i:s'),
+                'sou' => $sou !== null ? [
+                    'salari_base' => $sou->getSalariBase(),
+                    'complements' => $sou->getComplements(),
+                    'irpf_actual' => $sou->getIrpfActual(),
+                    'seguretat_social_actual' => $sou->getSeguretatSocialActual(),
+                ] : [],
+            ];
+        }, $users);
+
+        $this->logger->info('Listed all users', ['actor_id' => $this->getUser()?->getId()]);
+
+        return $this->json($userData);
+    }
+
     #[Route('/user', name: 'app_user')]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function getUserData(): JsonResponse
@@ -144,26 +172,26 @@ final class UserController extends AbstractController
     }
 
     #[Route('/user/fitxa', name: 'app_user_get_fitxa', methods: ['GET'])]
-#[IsGranted('IS_AUTHENTICATED_FULLY')]
-public function getFitxaActual(EntityManagerInterface $em): JsonResponse {
-    $user = $this->getUser();
-    $rep_fitxatge = $em->getRepository(Fitxatge::class);
-    $fitxa = $rep_fitxatge->getFitxaActual($user);
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function getFitxaActual(EntityManagerInterface $em): JsonResponse {
+        $user = $this->getUser();
+        $rep_fitxatge = $em->getRepository(Fitxatge::class);
+        $fitxa = $rep_fitxatge->getFitxaActual($user);
 
-    // Agafem només els camps que volem serialitzar
-    $history = array_map(function(Fitxatge $f) {
-        return [
-            'id' => $f->getId(),
-            'hora_inici' => $f->getHoraInici()?->format('Y-m-d H:i:s'),
-            'hora_fi' => $f->getHoraFi()?->format('Y-m-d H:i:s'),
-        ];
-    }, $rep_fitxatge->findBy(['usuari' => $user], ['hora_inici' => 'DESC'], 10));
+        // Agafem només els camps que volem serialitzar
+        $history = array_map(function(Fitxatge $f) {
+            return [
+                'id' => $f->getId(),
+                'hora_inici' => $f->getHoraInici()?->format('Y-m-d H:i:s'),
+                'hora_fi' => $f->getHoraFi()?->format('Y-m-d H:i:s'),
+            ];
+        }, $rep_fitxatge->findBy(['usuari' => $user], ['hora_inici' => 'DESC'], 10));
 
-    return $this->json([
-        'active' => (bool) $fitxa,
-        'history' => $history,
-    ]);
-}
+        return $this->json([
+            'active' => (bool) $fitxa,
+            'history' => $history,
+        ]);
+    }
 
     #[Route('/user/sou', name: 'app_user_sou')]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
