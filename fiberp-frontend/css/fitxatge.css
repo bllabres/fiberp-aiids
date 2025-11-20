@@ -208,64 +208,6 @@
   }
 }
 
-/* Panell d’edició centrat sota la taula */
-.edit-panel {
-  margin: 12px auto 24px;
-  padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(var(--blur));
-  border-radius: var(--radius);
-  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  transition: max-height 0.35s ease, opacity 0.35s ease;
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  width: 90%;
-  max-width: 500px;
-}
-
-.edit-panel.visible {
-  max-height: 500px;
-  opacity: 1;
-}
-
-#save-toast {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-20px);
-  background-color: #4caf50;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: bold;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 1s, transform 0.5s;
-  z-index: 10;
-}
-
-#save-toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-  animation: pop 0.5s ease-out;
-}
-
-@keyframes pop {
-  0% {
-    transform: translateX(-50%) translateY(-20px) scale(0.9);
-  }
-  50% {
-    transform: translateX(-50%) translateY(5px) scale(1.05);
-  }
-  100% {
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   .sou-container table,
@@ -304,5 +246,171 @@
   .btn-guardar {
     width: 100%;
     margin-top: 6px;
+  }
+}
+/* ============================== */
+/*       PANELL D'EDICIÓ          */
+/* ============================== */
+.edit-panel {
+  margin: 12px auto 24px; /* centrat sota la taula */
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(var(--blur));
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: max-height 0.35s ease, opacity 0.35s ease;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+
+  width: 90%; /* més estret */
+  max-width: 500px; /* ample màxim definit */
+}
+
+.edit-panel.visible {
+  max-height: 500px;
+  opacity: 1;
+}
+
+.edit-panel h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--accent);
+  text-align: center;
+}
+
+.edit-panel p {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 6px;
+}
+
+.edit-panel label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 3px;
+  display: block;
+}
+
+.edit-panel input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e6eef8;
+  background: #fbfdff;
+  font-size: 14px;
+  outline: none;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.edit-panel input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 5px 15px rgba(37, 99, 235, 0.12);
+}
+
+.panel-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+#save-btn,
+#cancel-btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#save-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+}
+
+#save-btn:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 5px 15px rgba(37, 99, 235, 0.2);
+}
+
+#cancel-btn {
+  background: #f3f4f6;
+  color: #1e293b;
+  border: none;
+}
+
+#cancel-btn:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .edit-panel {
+    width: 95%;
+    padding: 12px 16px;
+    gap: 6px;
+  }
+
+  .edit-panel h2 {
+    font-size: 18px;
+  }
+
+  .edit-panel input {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  #save-btn,
+  #cancel-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+#edit-panel {
+  position: relative; /* perquè el toast sigui relatiu al panell */
+}
+
+#save-toast {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s, transform 0.5s;
+  z-index: 10;
+}
+
+#save-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  animation: pop 0.5s ease-out;
+}
+
+@keyframes pop {
+  0% {
+    transform: translateX(-50%) translateY(-20px) scale(0.8);
+  }
+  50% {
+    transform: translateX(-50%) translateY(5px) scale(1.1);
+  }
+  100% {
+    transform: translateX(-50%) translateY(0) scale(1);
   }
 }
