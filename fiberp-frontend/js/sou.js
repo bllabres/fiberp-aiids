@@ -17,6 +17,17 @@ runWithToken((token) => {
     window.location.href = "login.html";
   });
 
+  const menuLinks = document.querySelectorAll(".menu a");
+  const currentPage = window.location.pathname.split("/").pop();
+  menuLinks.forEach((link) => {
+    const href = link.getAttribute("href");
+    if (href === "#") {
+      link.addEventListener("click", (e) => e.preventDefault());
+      return;
+    }
+    if (href === currentPage) link.classList.add("active");
+  });
+
   // Elements on mostrar les dades de sou
   const salariBaseEl = document.getElementById("salari_base");
   const complementsEl = document.getElementById("complements");

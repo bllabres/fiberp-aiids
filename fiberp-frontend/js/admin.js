@@ -18,6 +18,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     return (window.location.href = "login.html");
   }
 
+  const menuLinks = document.querySelectorAll(".menu a");
+  const currentPage = window.location.pathname.split("/").pop();
+  menuLinks.forEach((link) => {
+    const href = link.getAttribute("href");
+    if (href === "#") {
+      link.addEventListener("click", (e) => e.preventDefault());
+      return;
+    }
+    if (href === currentPage) link.classList.add("active");
+  });
+
   const tbody = document.querySelector("#sou-table tbody");
 
   const editPanel = document.getElementById("edit-panel");
