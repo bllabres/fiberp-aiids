@@ -501,23 +501,39 @@
     font-size: 13px;
   }
 }
+
 #save-toast {
   position: fixed;
-  bottom: 25px;
-  right: 25px;
-  background: #28a745;
-  color: #fff;
-  padding: 12px 18px;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background-color: #4caf50;
+  color: white;
+  padding: 12px 24px;
   border-radius: 8px;
   font-weight: bold;
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
   pointer-events: none;
-  z-index: 999;
+  z-index: 1000;
+  transition: opacity 0.5s, transform 0.5s;
 }
 
+/* Classe per mostrar-lo amb animació */
 #save-toast.show {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
+  animation: pop 0.5s ease-out;
+}
+
+/* Animació tipus “pop” */
+@keyframes pop {
+  0% {
+    transform: translateX(-50%) translateY(20px) scale(0.8);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-5px) scale(1.1);
+  }
+  100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
 }
