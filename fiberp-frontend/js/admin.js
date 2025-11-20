@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         seguretat_social_actual: Number(ssInput.value),
       }),
     });
-
+    showToast();
     editPanel.classList.remove("visible");
     loadUsers(); // 🔄 Actualitzar la taula
   });
@@ -108,6 +108,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     editPanel.classList.remove("visible");
     currentUser = null;
   });
+
+  function showToast() {
+    const toast = document.getElementById("save-toast");
+    toast.classList.add("show");
+
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 2000);
+  }
 
   /** ▶️ Inici */
   loadUsers();

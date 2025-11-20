@@ -501,3 +501,23 @@
     font-size: 13px;
   }
 }
+#save-toast {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: #28a745;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+  z-index: 999;
+}
+
+#save-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
