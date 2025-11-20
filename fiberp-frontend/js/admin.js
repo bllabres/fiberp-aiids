@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   lucide.createIcons();
   const token = localStorage.getItem("token");
   if (!token) return (window.location.href = "login.html");
+
+  /* 🔐 Validar usuari administrador */
   try {
     const me = await fetch("http://10.4.41.69:8080/user", {
       headers: { Authorization: `Bearer ${token}` },
@@ -15,6 +17,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error validant admin:", e);
     return (window.location.href = "login.html");
   }
+
   const tbody = document.querySelector("#sou-table tbody");
 
   const editPanel = document.getElementById("edit-panel");
@@ -26,9 +29,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const saveBtn = document.getElementById("save-btn");
   const cancelBtn = document.getElementById("cancel-btn");
 
-  let currentUserId = null;
+  let currentUser = null;
 
-  /** 📌 Carregar tots els usuaris */
+  /** 📌 Carregar tots els usuaris (amb sou ja inclòs) */
   async function loadUsers() {
     const res = await fetch("http://10.4.41.69:8080/users", {
       headers: { Authorization: `Bearer ${token}` },
@@ -38,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderTable(users);
   }
 
-  /** 📌 Mostrar la taula d’usuaris */
+  /** 📌 Mostrar taula */
   function renderTable(users) {
     tbody.innerHTML = users
       .map(
@@ -54,50 +57,36 @@ document.addEventListener("DOMContentLoaded", async () => {
       )
       .join("");
 
-    tbody.querySelectorAll("tr").forEach((row) => {
-      row.addEventListener("click", () => selectUser(Number(row.dataset.id)));
-    });
+    tbody
+      .querySelectorAll("tr")
+      .forEach((row) =>
+        row.addEventListener("click", () =>
+          selectUser(users.find((u) => u.id == row.dataset.id))
+        )
+      );
   }
 
-  /** 📌 Quan seleccionem usuari ➝ carregar el sou */
-  async function selectUser(id) {
-    currentUserId = id;
+  /** 📌 Seleccionar usuari i omplir sou directament del JSON */
+  function selectUser(user) {
+    currentUser = user;
 
-    const res = await fetch(`http://10.4.41.69:8080/user/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const user = await res.json();
-
-    // Mostrar nom
     nomEl.textContent = user.name;
 
-    // Ara carreguem el sou
-    const salaryRes = await fetch(`http://10.4.41.69:8080/user/${id}/sou`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!salaryRes.ok) {
-      // Si no té sou, inicialitzar valors
-      salariInput.value = 0;
-      complementsInput.value = 0;
-      irpfInput.value = 0;
-      ssInput.value = 0;
-    } else {
-      const s = await salaryRes.json();
-      salariInput.value = s.salari_base;
-      complementsInput.value = s.complements;
-      irpfInput.value = s.irpf_actual;
-      ssInput.value = s.seguretat_social_actual;
-    }
+    // Si no té sou ➝ inicialitzar a zero
+    const s = user.sou || {};
+    salariInput.value = s.salari_base || 0;
+    complementsInput.value = s.complements || 0;
+    irpfInput.value = s.irpf_actual || 0;
+    ssInput.value = s.seguretat_social_actual || 0;
 
     editPanel.classList.add("visible");
   }
 
-  /** 💾 Guardar canvis de sou */
+  /** 💾 Guardar sou (PUT) */
   saveBtn.addEventListener("click", async () => {
-    if (!currentUserId) return;
+    if (!currentUser) return;
 
-    await fetch(`http://10.4.41.69:8080/user/${currentUserId}/sou`, {
+    await fetch(`http://10.4.41.69:8080/user/${currentUser.id}/sou`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -112,11 +101,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     editPanel.classList.remove("visible");
+    loadUsers(); // 🔄 Actualitzar la taula
   });
 
   cancelBtn.addEventListener("click", () => {
     editPanel.classList.remove("visible");
-    currentUserId = null;
+    currentUser = null;
   });
 
   /** ▶️ Inici */
