@@ -502,6 +502,10 @@
   }
 }
 
+#edit-panel {
+  position: relative; /* perquè el toast sigui relatiu al panell */
+}
+
 #save-toast {
   position: fixed;
   bottom: 20px;
