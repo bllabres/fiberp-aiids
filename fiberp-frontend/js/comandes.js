@@ -4,7 +4,6 @@ function runWithToken(callback) {
     window.location.href = "login.html";
     return;
   }
-
   callback(token);
 }
 
@@ -27,7 +26,8 @@ runWithToken((token) => {
 
   const tbody = document.querySelector("#orders-table tbody");
   const detailsContainer = document.getElementById("orderDetailsContainer");
-  let selectedOrderId = null; // 👈 Declarada al principi
+
+  let selectedOrderId = null;
 
   // 🔹 Funció per mostrar la llista de comandes
   function displayOrders(orders) {
@@ -48,13 +48,7 @@ runWithToken((token) => {
     // Afegir click a cada fila
     tbody.querySelectorAll("tr").forEach((row) => {
       row.addEventListener("click", () => {
-        // Marca la fila seleccionada
-        tbody
-          .querySelectorAll("tr")
-          .forEach((r) => r.classList.remove("selected"));
-        row.classList.add("selected");
-
-        selectedOrderId = row.dataset.orderId;
+        selectedOrderId = row.dataset.orderId; // Guardem la comanda seleccionada
         fetchOrderDetails(selectedOrderId);
       });
     });
@@ -116,13 +110,13 @@ runWithToken((token) => {
                 const preu = parseFloat(item.producte.preu) || 0;
                 const total = parseFloat(item.total) || 0;
                 return `
-                  <tr>
-                    <td>${item.producte.nom}</td>
-                    <td>${preu.toFixed(2)} €</td>
-                    <td>${item.quantitat}</td>
-                    <td>${total.toFixed(2)} €</td>
-                  </tr>
-                `;
+      <tr>
+        <td>${item.producte.nom}</td>
+        <td>${preu.toFixed(2)} €</td>
+        <td>${item.quantitat}</td>
+        <td>${total.toFixed(2)} €</td>
+      </tr>
+    `;
               })
               .join("")}
           </tbody>
@@ -156,15 +150,16 @@ runWithToken((token) => {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append("albara_file", file); // ⚠️ el nom ha de coincidir amb el backend
+    formData.append("albara_file", file); // Nom que espera Symfony
 
     try {
       const res = await fetch(
         `http://10.4.41.69:8080/order/${selectedOrderId}`,
         {
-          method: "POST",
+          method: "PUT", // ✅ PUT per actualitzar la comanda
           headers: {
             Authorization: `Bearer ${token}`,
+            // No posar 'Content-Type': FormData el gestiona
           },
           body: formData,
         }
@@ -172,10 +167,11 @@ runWithToken((token) => {
 
       if (res.ok) {
         alert("📄 Albarà pujat correctament!");
-        fetchOrderDetails(selectedOrderId); // refrescar detalls
-        fetchOrders(); // refrescar taula
+        fetchOrderDetails(selectedOrderId);
+        fetchOrders();
       } else {
-        alert("❌ Error pujant l’albarà");
+        const errorText = await res.text();
+        alert(`❌ Error pujant l’albarà: ${errorText}`);
       }
     } catch (err) {
       alert("⚠️ Error amb la pujada");
