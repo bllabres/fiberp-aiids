@@ -1,5 +1,6 @@
 function runWithToken(callback) {
-  const token = localStorage.getItem("token");
+  //const token = localStorage.getItem("token");
+  const token = 1;
   if (!token) {
     window.location.href = "login.html";
     return;
@@ -48,6 +49,7 @@ runWithToken((token) => {
     tbody.querySelectorAll("tr").forEach((row) => {
       row.addEventListener("click", () => {
         const orderId = row.dataset.orderId;
+        selectedOrderId = orderId; // 👉 Guardem la comanda seleccionada
         fetchOrderDetails(orderId);
       });
     });
@@ -129,4 +131,51 @@ runWithToken((token) => {
 
   // 🔹 Inicialment carreguem la llista de comandes
   fetchOrders();
+
+  // 🔹 Botó pujar albarà
+  const uploadBtn = document.getElementById("uploadAlbaraBtn");
+  const fileInput = document.getElementById("inputAlbara");
+  let selectedOrderId = null;
+
+  // Activar input quan cliques el botó
+  uploadBtn.addEventListener("click", () => {
+    if (!selectedOrderId) {
+      alert("Selecciona una comanda primer!");
+      return;
+    }
+    fileInput.click();
+  });
+
+  // Quan escull fitxer, el puja
+  fileInput.addEventListener("change", async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("albara", file);
+
+    try {
+      const res = await fetch(
+        `http://10.4.41.69:8080/order/${selectedOrderId}/albara`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (res.ok) {
+        alert("📄 Albarà pujat correctament!");
+        fetchOrderDetails(selectedOrderId); // refrescar detalls
+        fetchOrders(); // refrescar taula
+      } else {
+        alert("❌ Error pujant l’albarà");
+      }
+    } catch (err) {
+      alert("⚠️ Error amb la pujada");
+      console.error(err);
+    }
+  });
 });

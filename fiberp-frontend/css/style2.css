@@ -842,3 +842,18 @@ input[readonly]::placeholder {
     color: var(--muted);
   }
 }
+.btn-upload {
+  background: #2563eb;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  margin-bottom: 12px;
+  transition: background 0.25s ease;
+}
+
+.btn-upload:hover {
+  background: #1e3a8a;
+}
