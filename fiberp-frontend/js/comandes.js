@@ -48,6 +48,10 @@ runWithToken((token) => {
     // Afegir click a cada fila
     tbody.querySelectorAll("tr").forEach((row) => {
       row.addEventListener("click", () => {
+        tbody
+          .querySelectorAll("tr")
+          .forEach((r) => r.classList.remove("selected"));
+        row.classList.add("selected");
         selectedOrderId = row.dataset.orderId; // Guardem la comanda seleccionada
         fetchOrderDetails(selectedOrderId);
       });
