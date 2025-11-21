@@ -857,3 +857,6 @@ input[readonly]::placeholder {
 .btn-upload:hover {
   background: #1e3a8a;
 }
+#orders-table tr.selected {
+  background: #c9eaff;
+}

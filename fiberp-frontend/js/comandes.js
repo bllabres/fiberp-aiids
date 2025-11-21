@@ -1,6 +1,5 @@
 function runWithToken(callback) {
-  //const token = localStorage.getItem("token");
-  const token = 1;
+  const token = localStorage.getItem("token");
   if (!token) {
     window.location.href = "login.html";
     return;
@@ -28,6 +27,7 @@ runWithToken((token) => {
 
   const tbody = document.querySelector("#orders-table tbody");
   const detailsContainer = document.getElementById("orderDetailsContainer");
+  let selectedOrderId = null; // 👈 Declarada al principi
 
   // 🔹 Funció per mostrar la llista de comandes
   function displayOrders(orders) {
@@ -48,9 +48,14 @@ runWithToken((token) => {
     // Afegir click a cada fila
     tbody.querySelectorAll("tr").forEach((row) => {
       row.addEventListener("click", () => {
-        const orderId = row.dataset.orderId;
-        selectedOrderId = orderId; // 👉 Guardem la comanda seleccionada
-        fetchOrderDetails(orderId);
+        // Marca la fila seleccionada
+        tbody
+          .querySelectorAll("tr")
+          .forEach((r) => r.classList.remove("selected"));
+        row.classList.add("selected");
+
+        selectedOrderId = row.dataset.orderId;
+        fetchOrderDetails(selectedOrderId);
       });
     });
   }
@@ -111,13 +116,13 @@ runWithToken((token) => {
                 const preu = parseFloat(item.producte.preu) || 0;
                 const total = parseFloat(item.total) || 0;
                 return `
-      <tr>
-        <td>${item.producte.nom}</td>
-        <td>${preu.toFixed(2)} €</td>
-        <td>${item.quantitat}</td>
-        <td>${total.toFixed(2)} €</td>
-      </tr>
-    `;
+                  <tr>
+                    <td>${item.producte.nom}</td>
+                    <td>${preu.toFixed(2)} €</td>
+                    <td>${item.quantitat}</td>
+                    <td>${total.toFixed(2)} €</td>
+                  </tr>
+                `;
               })
               .join("")}
           </tbody>
@@ -135,7 +140,6 @@ runWithToken((token) => {
   // 🔹 Botó pujar albarà
   const uploadBtn = document.getElementById("uploadAlbaraBtn");
   const fileInput = document.getElementById("inputAlbara");
-  let selectedOrderId = null;
 
   // Activar input quan cliques el botó
   uploadBtn.addEventListener("click", () => {
@@ -152,11 +156,11 @@ runWithToken((token) => {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append("albara", file);
+    formData.append("albara_file", file); // ⚠️ el nom ha de coincidir amb el backend
 
     try {
       const res = await fetch(
-        `http://10.4.41.69:8080/order/${selectedOrderId}/albara`,
+        `http://10.4.41.69:8080/order/${selectedOrderId}`,
         {
           method: "POST",
           headers: {
