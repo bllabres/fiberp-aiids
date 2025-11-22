@@ -37,6 +37,10 @@ if (!token) {
 
       const user = await response.json();
 
+      const parts = user.name ? user.name.trim().split(" ") : [];
+      const nomUsuari = parts.shift() || "";
+      const cognomsUsuari = parts.join(" ") || "";
+
       // Omplir vista lateral
       document.getElementById("perfil-nombre").textContent = user.name || "";
       document.getElementById("perfil-email").textContent = user.email || "";
@@ -45,8 +49,8 @@ if (!token) {
       // document.getElementById("perfil-empresa").textContent = user.empresa || ""; // si tens camp empresa
 
       // Omplir formulari
-      document.getElementById("nom").value = user.name || "";
-      document.getElementById("email").value = user.email || "";
+      document.getElementById("nom").value = nomUsuari;
+      document.getElementById("cognom").value = cognomsUsuari;
       document.getElementById("telefon").value = user.telefon || "";
       // La contrasenya queda buida per seguretat
       document.getElementById("password").value = "";
@@ -76,7 +80,10 @@ if (!token) {
       alert("Les contrasenyes no coincideixen.");
       return;
     }
-
+    if (password && password.length < 6) {
+      alert("La contrasenya ha de tenir un mínim de 6 caràcters.");
+      return;
+    }
     // Preparació de l'objecte a enviar
     // El backend espera 'name', així que unim nom i cognom si cal
     const fullName = cognom ? `${nom} ${cognom}` : nom;
