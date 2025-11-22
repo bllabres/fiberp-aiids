@@ -36,10 +36,9 @@ if (!token) {
         throw new Error("No s'han pogut carregar les dades de l'usuari");
 
       const user = await response.json();
-
-      const parts = user.name ? user.name.trim().split(" ") : [];
-      const nomUsuari = parts.shift() || "";
-      const cognomsUsuari = parts.join(" ") || "";
+      const parts = user.name ? user.name.trim().split(/\s+/) : [];
+      const nomUsuari = parts[0] || "";
+      const cognomsUsuari = parts.length > 1 ? parts.slice(1).join(" ") : "";
 
       // Omplir vista lateral
       document.getElementById("perfil-nombre").textContent = user.name || "";
@@ -86,8 +85,7 @@ if (!token) {
     }
     // Preparació de l'objecte a enviar
     // El backend espera 'name', així que unim nom i cognom si cal
-    const fullName = cognom ? `${nom} ${cognom}` : nom;
-
+    const fullName = `${nom} ${cognom}`.trim().replace(/\s+/g, " ");
     const dadesAEnviar = {
       name: fullName,
       email: email,
