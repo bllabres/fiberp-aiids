@@ -37,10 +37,24 @@ class LoginSubscriber implements EventSubscriberInterface
 
         $ip = $event->getRequest()->getClientIp();
 
-        $this->logger->info('Inicio de sesión exitoso', [
+        $hora_actual = (new \DateTime('now', new \DateTimeZone('Europe/Madrid')))->format('H:i:s');
+        $hora_inici = $user->getIniciJornada()->format('H:i:s');
+        $hora_fi = $user->getFiJornada()->format('H:i:s');
+        $is_admin = in_array('ROLE_ADMIN', $user->getRoles());
+
+        $this->logger->info('Successful login', [
             'ip' => $ip,
             'user' => $username
         ]);
+
+        // Si la hora actual NO está dentro del rango
+        if (!$is_admin && ($hora_actual < $hora_inici || $hora_actual > $hora_fi)) {
+            $this->logger->warning('Login out of working hours', [
+                'ip' => $ip,
+                'hora_actual' => $hora_actual,
+                'user' => $user,
+            ]);
+        }
     }
 
     public function onLoginFailure(LoginFailureEvent $event): void
@@ -49,10 +63,10 @@ class LoginSubscriber implements EventSubscriberInterface
         $ip = $event->getRequest()->getClientIp();
         $error = $event->getException()->getMessageKey();
 
-        $this->logger->warning('Fallo de inicio de sesion', [
+        $this->logger->warning('Login failure', [
             'ip' => $ip,
             'error' => $error,
-            'user' => $credentials ?: 'usuario desconocido'
+            'user' => $credentials ?: 'unknown',
         ]);
     }
 

@@ -55,9 +55,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Fitxatge::class, mappedBy: 'usuari', orphanRemoval: true)]
     private Collection $fitxatges;
 
+    #[ORM\Column(type: Types::TIME_MUTABLE, options: ['default' => '08:00:00'])]
+    private ?\DateTime $inici_jornada = null;
+
+    #[ORM\Column(type: Types::TIME_MUTABLE, options: ['default' => '17:00:00'])] // 8h + 1h per dinar per exemple
+    private ?\DateTime $fi_jornada = null;
+
     public function __construct()
     {
         $this->fitxatges = new ArrayCollection();
+
+        $this->inici_jornada = new \DateTime('08:00');
+        $this->fi_jornada = new \DateTime('17:00'); // 8h + 1h per dinar per exemple
     }
 
     public function getId(): ?int
@@ -232,6 +241,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $fitxatge->setUsuari(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getIniciJornada(): ?\DateTime
+    {
+        return $this->inici_jornada;
+    }
+
+    public function setIniciJornada(\DateTime $inici_jornada): static
+    {
+        $this->inici_jornada = $inici_jornada;
+
+        return $this;
+    }
+
+    public function getFiJornada(): ?\DateTime
+    {
+        return $this->fi_jornada;
+    }
+
+    public function setFiJornada(\DateTime $fi_jornada): static
+    {
+        $this->fi_jornada = $fi_jornada;
 
         return $this;
     }

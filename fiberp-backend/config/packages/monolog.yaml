@@ -1,5 +1,5 @@
 monolog:
-    channels: [deprecation, 'login', 'user', 'order', 'product', 'file_upload'] # Deprecations are logged in the dedicated "deprecation" channel when it exists
+    channels: [deprecation, 'login', 'user', 'order', 'product', 'file_upload', 'password_change'] # Deprecations are logged in the dedicated "deprecation" channel when it exists
 
 when@dev:
     monolog:
@@ -12,33 +12,39 @@ when@dev:
                 formatter: monolog.formatter.custom_line
             login:
                 type: stream
-                path: "%kernel.logs_dir%/login.log"
+                path: "%kernel.logs_dir%/security.log"
                 level: info
                 channels: [ 'login' ]  # 👈 Handler asociado al canal "login"
                 formatter: monolog.formatter.custom_line
             user:
                 type: stream
-                path: "%kernel.logs_dir%/user.log"
+                path: "%kernel.logs_dir%/generic.log"
                 level: info
                 channels: [ 'user' ]  # 👈 Handler asociado al canal "user"
                 formatter: monolog.formatter.custom_line
             order:
                 type: stream
-                path: "%kernel.logs_dir%/order.log"
+                path: "%kernel.logs_dir%/generic.log"
                 level: debug
                 channels: [ "order" ]
                 formatter: monolog.formatter.custom_line
             product:
                 type: stream
-                path: "%kernel.logs_dir%/product.log"
+                path: "%kernel.logs_dir%/generic.log"
                 level: debug
                 channels: [ "product" ]
                 formatter: monolog.formatter.custom_line
             file_upload:
                 type: stream
-                path: "%kernel.logs_dir%/file_upload.log"
+                path: "%kernel.logs_dir%/security.log"
                 level: debug
                 channels: [ "file_upload" ]
+                formatter: monolog.formatter.custom_line
+            password_change:
+                type: stream
+                path: "%kernel.logs_dir%/security.log"
+                level: debug
+                channels: [ "password_change" ]
                 formatter: monolog.formatter.custom_line
             # uncomment to get logging in your browser
             # you may have to allow bigger header sizes in your Web server configuration

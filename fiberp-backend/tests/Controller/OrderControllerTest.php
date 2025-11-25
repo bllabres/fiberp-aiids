@@ -65,31 +65,36 @@ final class OrderControllerTest extends BaseApiTestCase
         $token = $this->getJwtToken($user->getEmail(), 'password');
         $product = $this->createProduct('Bolígraf', '0.80', 'Blau', 200);
 
+        // First create order via JSON (without albarà)
+        $this->authJsonRequest('POST', '/order', $token, [
+            'estat' => 'with-file',
+            'items' => [
+                ['producteId' => $product->getId(), 'quantitat' => 1],
+            ],
+        ]);
+        $respCreate = $this->client->getResponse();
+        $this->assertSame(201, $respCreate->getStatusCode(), $respCreate->getContent());
+        $created = json_decode($respCreate->getContent(), true);
+        $oid = $created['id'] ?? null;
+        $this->assertNotEmpty($oid);
+
         // Create a temporary "PDF" file
         $tmp = tempnam(sys_get_temp_dir(), 'pdf_');
         file_put_contents($tmp, "%PDF-1.4\n% test\n");
         $uploaded = new UploadedFile($tmp, 'albara.pdf', 'application/pdf', null, true);
 
-        $formFields = [
-            'estat' => 'with-file',
-            // items must be JSON string in multipart
-            'items' => json_encode([
-                ['producteId' => $product->getId(), 'quantitat' => 1],
-            ]),
-        ];
-
         $this->authMultipartRequest(
             'POST',
-            '/order',
+            '/order/' . $oid . '/albara',
             $token,
-            $formFields,
+            [],
             ['albara_file' => $uploaded]
         );
 
         $resp = $this->client->getResponse();
-        $this->assertSame(201, $resp->getStatusCode(), $resp->getContent());
+        $this->assertSame(200, $resp->getStatusCode(), $resp->getContent());
         $data = json_decode($resp->getContent(), true);
-        $this->assertSame('Order created', $data['status'] ?? null);
+        $this->assertSame('Albara uploaded', $data['status'] ?? null);
         $this->assertNotEmpty($data['albara'] ?? null);
     }
 }

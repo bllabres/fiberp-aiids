@@ -20,11 +20,14 @@ use DateTime;
 final class UserController extends AbstractController
 {
     private LoggerInterface $logger;
+    private LoggerInterface $password_logger;
 
     public function __construct(
-        #[Autowire(service: 'monolog.logger.user')]LoggerInterface $logger
+        #[Autowire(service: 'monolog.logger.user')]LoggerInterface $logger,
+        #[Autowire(service: 'monolog.logger.password_change')]LoggerInterface $password_change
     ) {
         $this->logger = $logger;
+        $this->password_logger = $password_change;
     }
 
     #[Route('/users', name: 'app_users_list', methods: ['GET'])]
@@ -111,6 +114,10 @@ final class UserController extends AbstractController
             $user->setPassword($hashedPassword);
             $changed = true;
             $updatedFields[] = 'password';
+            $this->password_logger->info("Password changed", [
+                'actor_id' => $user?->getId(),
+                'ip' => $request->getClientIp(),
+            ]);
         }
 
         if (!$changed) {
@@ -244,6 +251,10 @@ final class UserController extends AbstractController
             $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
             $user->setPassword($hashedPassword);
             $changed = true;
+            $this->password_logger->info("Password changed by admin", [
+                'actor_id' => $user?->getId(),
+                'ip' => $request->getClientIp(),
+            ]);
         }
         if (isset($data['roles']) && is_array($data['roles'])) {
             $user->setRoles($data['roles']);
