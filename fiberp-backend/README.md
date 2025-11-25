@@ -1,86 +1,229 @@
-# Fiberp Backend - API Endpoints (Symfony + JWT)
+# Fiberp Backend (Symfony + JWT)
 
-Este proyecto expone una API REST sencilla para registro, login con JWT (LexikJWTAuthenticationBundle) y obtención del usuario autenticado.
+Backend REST en Symfony con autenticación JWT (LexikJWTAuthenticationBundle), gestión de usuarios, productos y pedidos, control de fichajes y manejo de subida de albaranes en pedidos.
 
-- Base URL local por defecto: http://127.0.0.1:8000
-- Autenticación: JWT (Bearer token) con TTL configurado a 3600 segundos.
-- Formato: JSON en bodies y responses. Incluye siempre `Content-Type: application/json` en peticiones con cuerpo.
+- Base URL por defecto: http://127.0.0.1:8000
+- Autenticación: JWT Bearer, TTL 3600s
+- Formato: JSON en cuerpos y respuestas, salvo subida de albarán (multipart/form-data)
 
-Contenido:
-- Endpoints disponibles y esquemas de request/response
-- Cómo testear con curl/Postman
-- Cómo interactuar desde JavaScript (fetch)
+Contenido
+- Descripción y requisitos
+- Instalación y configuración (JWT, base de datos, ejecución)
+- Estructura del proyecto
+- Autenticación y logging
+- Endpoints (Auth, Users, Admin, Productes, Comandes/Orders, Fitxatge)
+- Ejemplos con curl
+- Pruebas (PHPUnit)
+- Solución de problemas
 
 ---
 
-## Endpoints
+## 1) Requisitos
 
-### 1) Registro de usuario
-- Método/Path: POST /register
-- Auth: Pública (no requiere token)
-- Body JSON:
-  ```json
+- PHP 8.2+
+- Composer 2.x
+- Extensiones PHP típicas para Symfony/Doctrine (pdo_mysql o pdo_sqlite, intl, mbstring, openssl, json, etc.)
+- Opcional: Symfony CLI para ejecutar el servidor local
+
+## 2) Instalación rápida
+
+1. Clonar e instalar dependencias
+   - git clone <repo>
+   - cd fiberp-backend
+   - composer install
+
+2. Configurar variables de entorno
+   - Copia .env a .env.local y ajusta al entorno local.
+   - Define al menos:
+     - DATABASE_URL (SQLite o MySQL/PostgreSQL)
+       - Ej. SQLite: DATABASE_URL="sqlite:///%kernel.project_dir%/var/data_dev.db"
+       - Ej. MySQL: DATABASE_URL="mysql://user:pass@127.0.0.1:3306/fiberp?serverVersion=8.0"
+     - APP_ENV=dev, APP_SECRET=<cadena-aleatoria>
+     - JWT_PASSPHRASE=<frase>
+
+3. Generar claves JWT (recomendado)
+   - php bin/console lexik:jwt:generate-keypair
+   - Esto generará las claves en config/jwt y actualizará JWT_PASSPHRASE si fuese necesario.
+   - Verifica config/packages/lexik_jwt_authentication.yaml: usa las variables de entorno JWT_SECRET_KEY, JWT_PUBLIC_KEY y JWT_PASSPHRASE.
+
+4. Preparar base de datos
+   - php bin/console doctrine:database:create (si aplica)
+   - php bin/console doctrine:migrations:migrate -n
+
+5. Ejecutar en local
+   - Con Symfony CLI: symfony server:start -d
+   - O con PHP embebido: php -S 127.0.0.1:8000 -t public
+
+---
+
+## 3) Estructura del proyecto (resumen)
+
+- public/ index.php (front controller), uploads/
+- src/
+  - Controller/ AuthController, UserController, ProductController, OrderController
+  - Entity/ User, Producte, Comanda, ItemComanda, Sou, Fitxatge, RegistreSou
+  - Repository/ FitxatgeRepository y repos de entidades
+  - EventSubscriber/ LoginSubscriber
+- config/
+  - packages/ security.yaml, lexik_jwt_authentication.yaml, doctrine.yaml, monolog.yaml
+  - jwt/ claves JWT en dev
+- tests/ PHPUnit funcionales de controladores
+- var/log/ logs de seguridad y genéricos
+
+---
+
+## 4) Autenticación y seguridad
+
+- /register y /login son públicos.
+- Todo lo demás requiere Authorization: Bearer <JWT> (según access_control de security.yaml).
+- Inicio de sesión via JSON Login (username: email, password: password) devuelve token JWT.
+- El JWT expira a los 3600s (token_ttl en lexik_jwt_authentication.yaml).
+
+Cabeceras comunes
+- Content-Type: application/json en peticiones con cuerpo JSON
+- Authorization: Bearer <token>
+
+Roles
+- ROLE_USER por defecto
+- ROLE_ADMIN para endpoints de administración de usuarios y salarios
+
+---
+
+## 5) Logging
+
+Monolog configurado con canales:
+- login, user, order, product, file_upload, password_change
+- Ficheros: var/log/security.log y var/log/generic.log (en dev)
+
+---
+
+## 6) Endpoints
+
+Nota: Todos los cuerpos/outputs son JSON salvo la subida de albarán que es multipart/form-data.
+
+### 6.1 Autenticación
+
+POST /register (público)
+- Body:
   {
     "email": "usuario@ejemplo.com",
     "password": "TuPasswordSeguro123",
     "name": "Nombre Apellido",
     "telefon": "+34 600 000 000"
   }
-  ```
-- Response 201 (Created):
-  ```json
+- 201 Created:
   {
     "status": "User created",
     "user_identifier": "usuario@ejemplo.com"
   }
-  ```
-- Notas:
-  - `email` debe ser único. Si ya existe, fallará por la restricción de unicidad.
-  - Se crean automáticamente las marcas de tiempo y el rol inicial `ROLE_USER`.
 
-### 2) Login (obtención de JWT)
-- Método/Path: POST /login
-- Auth: Pública (no requiere token)
-- Body JSON:
-  ```json
-  {
-    "email": "usuario@ejemplo.com",
-    "password": "TuPasswordSeguro123"
-  }
-  ```
-- Response 200 (OK):
-  ```json
-  {
-    "token": "<JWT>"
-  }
-  ```
-  Donde `<JWT>` es el token que debes enviar en el header `Authorization: Bearer <JWT>` en las peticiones protegidas.
-- Notas:
-  - El endpoint `/login` está gestionado por el firewall `json_login` y utiliza los handlers de LexikJWT para devolver el token.
-  - El token expira en 3600 segundos (configurable en `config/packages/lexik_jwt_authentication.yaml`).
+POST /login (público)
+- Body:
+  { "email": "usuario@ejemplo.com", "password": "TuPasswordSeguro123" }
+- 200 OK:
+  { "token": "<JWT>" }
 
-### 3) Usuario autenticado
-- Método/Path: GET /user
-- Auth: Protegido (requiere `Authorization: Bearer <JWT>`)
-- Response 200 (OK):
-  ```json
+### 6.2 Usuario (ROLE_USER)
+
+GET /user
+- 200 OK: { id, email, name, telefon, roles, createdAt }
+
+PUT|PATCH /user
+- Body (parcial): { email?, name?, telefon?, password? }
+- 200 OK: devuelve los datos actualizados
+- 409 Conflict: email duplicado
+
+GET /user/sou
+- 200 OK: { salari_base, complements, irpf_actual, seguretat_social_actual }
+- 404 si no hay datos
+
+Fichaje (Fitxatge)
+- POST /user/fitxa -> inicia fichaje. 200 { status: "succcess" }
+- DELETE /user/fitxa -> finaliza ficha activa. 200 { status: "success" }
+- GET /user/fitxa -> estado actual y últimas 10 fichas
   {
-    "id": 1,
-    "email": "usuario@ejemplo.com",
-    "name": "Nombre Apellido",
-    "telefon": "+34 600 000 000",
-    "roles": ["ROLE_USER"]
+    "active": true|false,
+    "history": [ { id, hora_inici, hora_fi }, ... ]
   }
-  ```
-- Notas:
-  - Devuelve datos del usuario autenticado según el token proporcionado.
+
+### 6.3 Administración de usuarios (ROLE_ADMIN)
+
+GET /users
+- Lista todos los usuarios con información básica y salario (si existe)
+
+GET /user/{id}
+- Devuelve usuario por id
+
+PUT|PATCH /user/{id}
+- Body (parcial): { email?, name?, telefon?, password?, roles?[] }
+
+PUT|PATCH /user/{id}/sou
+- Body (parcial numérico): { salari_base?, complements?, irpf_actual?, seguretat_social_actual? }
+- Crea el registro de salario si no existía
+
+DELETE /user/{id}
+- Elimina el usuario indicado
+
+### 6.4 Productes (ROLE_USER)
+
+GET /product
+- Lista productos: [{ id, nom, preu, descripcio, quantitat }, ...]
+
+GET /product/{id}
+- Producto por id
+
+POST /product
+- Body: { nom, preu, descripcio, quantitat }
+- 201 Created con el producto creado
+
+PUT|PATCH /product/{id}
+- Body parcial con los campos a modificar
+
+DELETE /product/{id}
+- 204 No Content
+
+### 6.5 Comandes / Orders (ROLE_USER)
+
+GET /order
+- Lista pedidos: [{ id, estat, total, albara, num_products }]
+
+GET /order/{id}
+- Devuelve pedido incluyendo items y resumen de productos
+  {
+    id, estat, total, albara, num_products,
+    items: [{ id, producte: { id, nom, preu }, quantitat, total }]
+  }
+
+POST /order
+- Crea pedido SOLO con JSON (no sube albarán aquí)
+- Body:
+  {
+    "estat": "pending|...",
+    "items": [ { "producteId": 1, "quantitat": 2 }, ... ]
+  }
+- 201 Created:
+  { status: "Order created", id, estat, total, albara: null }
+
+POST /order/{id}/albara
+- Sube el albarán en PDF para un pedido existente
+- Content-Type: multipart/form-data, campo: albara_file
+- Validaciones: solo PDF, se guarda en public/uploads/albarans
+- 200 OK:
+  { status: "Albara uploaded", id, estat, total, albara: "uploads/albarans/xxxx.pdf" }
+
+PUT|PATCH /order/{id}
+- Body parcial: { estat?, albara?, items?[] }
+- Si se envían items, reemplaza todos los items y recalcula total
+- 200 OK: { status: "Order updated", id, estat, total, albara }
+
+DELETE /order/{id}
+- 204 No Content
 
 ---
 
-## Cómo testear con curl
+## 7) Ejemplos con curl
 
-1) Registrar un usuario nuevo:
-```bash
+Registro
 curl -X POST http://127.0.0.1:8000/register \
   -H "Content-Type: application/json" \
   -d '{
@@ -89,31 +232,72 @@ curl -X POST http://127.0.0.1:8000/register \
     "name": "Nombre Apellido",
     "telefon": "+34 600 000 000"
   }'
-```
 
-2) Hacer login y obtener el token:
-```bash
-curl -X POST http://127.0.0.1:8000/login \
+Login (recupera token)
+TOKEN=$(curl -s -X POST http://127.0.0.1:8000/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"usuario@ejemplo.com","password":"TuPasswordSeguro123"}' | jq -r .token)
+
+Crear producto
+curl -X POST http://127.0.0.1:8000/product \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"nom":"Paper A4","preu":"3.20","descripcio":"Pack 500","quantitat":50}'
+
+Crear pedido (sin albarán)
+ORDER=$(curl -s -X POST http://127.0.0.1:8000/order \
+  -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "usuario@ejemplo.com",
-    "password": "TuPasswordSeguro123"
-  }'
-```
-Respuesta esperada:
-```json
-{
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..."
-}
-```
+    "estat":"pending",
+    "items":[{"producteId":1,"quantitat":2}]
+  }')
+OID=$(echo "$ORDER" | jq -r .id)
 
-3) Llamar a un endpoint protegido con el token (reemplaza <JWT> por el valor real):
-```bash
-curl http://127.0.0.1:8000/user \
-  -H "Authorization: Bearer <JWT>"
-```
+Subir albarán PDF
+curl -X POST http://127.0.0.1:8000/order/$OID/albara \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "albara_file=@/ruta/a/albara.pdf;type=application/pdf"
+
+Listar pedidos
+curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8000/order
+
+Fichaje
+curl -X POST -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8000/user/fitxa
+curl -X DELETE -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8000/user/fitxa
+curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8000/user/fitxa
 
 ---
+
+## 8) Pruebas (PHPUnit)
+
+- Ejecutar tests:
+  ./vendor/bin/phpunit tests
+
+Los tests funcionales cubren flujos de autenticación, usuarios, productos y pedidos, incluido el flujo de albarán: primero crear pedido por JSON y después subir el PDF con /order/{id}/albara.
+
+---
+
+## 9) Errores comunes y solución de problemas
+
+- 401 Unauthorized: falta o es inválido el header Authorization. Haz login y reintenta con Bearer <token>.
+- 403 Forbidden: tu usuario no tiene permisos (p.ej. endpoints ROLE_ADMIN).
+- 404 Not Found: recurso inexistente (usuario/producto/pedido).
+- 409 Conflict: email ya en uso al actualizar/crear usuario.
+- 400 Bad Request: JSON inválido, campos requeridos ausentes, cantidades <= 0, o falta el campo albara_file en la subida de albarán.
+- Subida de albarán: solo se aceptan PDFs. El fichero se guarda en public/uploads/albarans y el path relativo se devuelve en la respuesta.
+
+Logs
+- Revisa var/log/security.log y var/log/generic.log en dev para diagnósticos.
+
+---
+
+## 10) Notas de despliegue
+
+- Establece APP_ENV=prod y APP_SECRET en el entorno de producción.
+- Genera y configura claves JWT y JWT_PASSPHRASE.
+- Configura DATABASE_URL acorde al motor de base de datos de producción.
+- Ejecuta migraciones: php bin/console doctrine:migrations:migrate -n
 
 ## Cómo testear con Postman/Insomnia
 - Crear petición POST a `http://127.0.0.1:8000/register` con body (raw JSON) y `Content-Type: application/json`.
@@ -214,162 +398,4 @@ Ajusta la `BASE_URL` en los ejemplos si usas otro host/puerto.
 
 ---
 
-## Nuevos endpoints añadidos en esta iteración
-
-Se han incorporado CRUDs para Productos y Comandas, y el controlador de Comandas ahora gestiona las líneas de pedido mediante `ItemComanda`.
-
-- Productos (`/product`): CRUD básico sobre la entidad `Producte`.
-- Comandas (`/order`): CRUD con gestión de `items` (líneas) y cálculo automático de totales.
-- Seguridad: Todas las rutas no públicas requieren JWT. En `OrderController` se aplica explícitamente `#[IsGranted('IS_AUTHENTICATED_FULLY')]` en cada endpoint. Para `ProductController`, la protección depende de la configuración global del firewall; en la configuración habitual del proyecto, también requerirán JWT.
-
-Fecha de actualización: 2025-10-26 20:04
-
-## Productos (Producte)
-
-Entidad y campos relevantes en las requests/responses:
-- `id` (number)
-- `nom` (string)
-- `preu` (string decimal, p. ej. "12.50")
-- `descripcio` (string)
-- `quantitat` (number entero)
-
-Endpoints:
-- GET `/product` — Lista todos los productos.
-- GET `/product/{id}` — Obtiene un producto por ID.
-- POST `/product` — Crea un producto nuevo.
-- PUT|PATCH `/product/{id}` — Actualiza total o parcialmente un producto.
-- DELETE `/product/{id}` — Elimina un producto por ID.
-
-Ejemplos curl:
-
-1) Listar
-```bash
-curl -H "Authorization: Bearer <JWT>" http://127.0.0.1:8000/product
-```
-
-2) Obtener por id
-```bash
-curl -H "Authorization: Bearer <JWT>" http://127.0.0.1:8000/product/1
-```
-
-3) Crear
-```bash
-curl -X POST http://127.0.0.1:8000/product \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <JWT>" \
-  -d '{
-    "nom": "Cable de fibra",
-    "preu": "19.99",
-    "descripcio": "Cable monomodo 10m",
-    "quantitat": 100
-  }'
-```
-Respuesta 201 típica:
-```json
-{
-  "status": "Product created",
-  "id": 5,
-  "nom": "Cable de fibra",
-  "preu": "19.99",
-  "descripcio": "Cable monomodo 10m",
-  "quantitat": 100
-}
-```
-
-4) Actualizar (parcial o total)
-```bash
-curl -X PATCH http://127.0.0.1:8000/product/5 \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <JWT>" \
-  -d '{ "quantitat": 95 }'
-```
-
-5) Borrar
-```bash
-curl -X DELETE -H "Authorization: Bearer <JWT>" http://127.0.0.1:8000/product/5 -i
-```
-- Códigos de respuesta: 200 (lecturas/actualizaciones), 201 (creación), 204 (borrado), 404 (no encontrado), 400 (JSON inválido o campos requeridos ausentes en creación).
-
-Notas:
-- El campo `preu` se maneja como string decimal en la API.
-
-## Comandas (Orders) con items (ItemComanda)
-
-Campos de `Comanda` en respuestas:
-- `id` (number)
-- `estat` (string)
-- `total` (string decimal) — calculado automáticamente a partir de los items
-- `albara` (string, opcional)
-- `num_products` (number) — suma de `quantitat` de todos los items
-- `items` (solo en GET detalle) — lista de líneas con: `id`, `producte` {`id`, `nom`, `preu`}, `quantitat`, `total`
-
-Esquema de `items` en creación/actualización:
-- Array de objetos `{ "producteId": number, "quantitat": number > 0 }`
-
-Endpoints:
-- GET `/order` — Lista comandas con `num_products` agregado.
-- GET `/order/{id}` — Detalle con `items` y `num_products`.
-- POST `/order` — Crea comanda. Requeridos: `estat`, `items`. Opcional: `albara` o PDF subido.
-- PUT|PATCH `/order/{id}` — Actualiza `estat` y/o `albara`. Si se envía `items`, se reemplazan todas las líneas y se recalcula el total.
-- DELETE `/order/{id}` — Elimina una comanda e, implícitamente, sus items (por mapeo con `orphanRemoval`).
-
-Importante: formato uniforme para creación
-- Todas las peticiones de creación de comanda (ya sea multipart/form-data o JSON) DEBEN incluir:
-  - `estat` (string)
-  - `items` (array)
-- El `albara` es OPCIONAL:
-  - Si subes un archivo PDF debe enviarse como campo de formulario `albara_file` (multipart/form-data). El archivo será almacenado y el campo Comanda.albara se establecerá en la ruta relativa almacenada.
-  - Si usas application/json, opcionalmente puedes proporcionar `"albara": "uploads/albarans/example.pdf"`.
-
-Ejemplos:
-
-1) Crear comanda con multipart/form-data y subida de PDF (recomendado al adjuntar un PDF)
-```bash
-curl -X POST http://127.0.0.1:8000/order \
-  -H "Authorization: Bearer <JWT>" \
-  -F "albara_file=@/path/to/albara.pdf" \
-  -F 'estat=nou' \
-  -F 'items=[{"producteId":1,"quantitat":2},{"producteId":3,"quantitat":1}]'
-```
-- Los archivos subidos se almacenan en `public/uploads/albarans/`.
-- El campo Comanda.albara guardado contendrá la ruta relativa `uploads/albarans/<filename>`.
-
-2) Crear comanda con application/json y una ruta de albara proporcionada
-```bash
-curl -X POST http://127.0.0.1:8000/order \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <JWT>" \
-  -d '{
-    "estat": "pendent",
-    "albara": "uploads/albarans/example.pdf",
-    "items": [
-      { "producteId": 1, "quantitat": 2 },
-      { "producteId": 3, "quantitat": 5 }
-    ]
-  }'
-```
-
-3) Crear comanda con application/json SIN albara (albara será null)
-```bash
-curl -X POST http://127.0.0.1:8000/order \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <JWT>" \
-  -d '{
-    "estat": "pendent",
-    "items": [
-      { "producteId": 1, "quantitat": 2 }
-    ]
-  }'
-```
-
-## Detalles de subida de albaranes (PDF)
-
-- Nombre del campo multipart/form-data para el archivo: `albara_file` (PDF requerido).
-- Campos de formulario: `estat` y `items` (items pueden ser proporcionados como una cadena JSON).
-- Ruta de almacenamiento: `public/uploads/albarans/` (Comanda.albara almacena `uploads/albarans/<filename>`).
-- Validación: el servidor validará el MIME/extension del archivo como PDF al subir.
-
-## Logging
-
-All file interactions (upload attempts, validation failures, storage errors, successes) are logged via the file logger service `monolog.logger.file_upload`. Order lifecycle events continue to be logged via the standard order logger.
 
