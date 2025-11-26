@@ -158,9 +158,9 @@ runWithToken((token) => {
 
     try {
       const res = await fetch(
-        `http://10.4.41.69:8080/order/${selectedOrderId}`,
+        `http://10.4.41.69:8080/order/${selectedOrderId}/albara`,
         {
-          method: "PUT", // ✅ PUT per actualitzar la comanda
+          method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
             // No posar 'Content-Type': FormData el gestiona
