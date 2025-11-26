@@ -859,6 +859,11 @@ input[readonly]::placeholder {
 #orders-table tr.selected {
   background: #c9eaff;
 }
+
+#sou-table tr.selected {
+  background: #c9eaff;
+}
+
 /* === CONTENIDOR GENERAL (llista + imatge centrats) === */
 .overview-section {
   display: flex;
