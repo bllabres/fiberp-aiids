@@ -115,10 +115,6 @@ if (!token) {
       );
       return;
     }
-    if (!email.value || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value)) {
-      alert("Introdueix un correu electrònic vàlid");
-      return;
-    }
 
     // Preparació de l'objecte a enviar
     const fullName = `${nom} ${cognom}`.trim().replace(/\s+/g, " ");
