@@ -68,13 +68,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       )
       .join("");
 
-    tbody
-      .querySelectorAll("tr")
-      .forEach((row) =>
-        row.addEventListener("click", () =>
-          selectUser(users.find((u) => u.id == row.dataset.id))
-        )
-      );
+    tbody.querySelectorAll("tr").forEach((row) => {
+      row.addEventListener("click", () => {
+        // Treu la classe 'selected' de totes les files
+        tbody
+          .querySelectorAll("tr")
+          .forEach((r) => r.classList.remove("selected"));
+
+        // Afegeix la classe 'selected' només a la fila clicada
+        row.classList.add("selected");
+
+        // Selecciona l'usuari corresponent
+        selectUser(users.find((u) => u.id == row.dataset.id));
+      });
+    });
   }
 
   /** 📌 Seleccionar usuari i omplir sou directament del JSON */
