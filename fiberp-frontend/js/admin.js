@@ -3,34 +3,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("token");
   if (!token) return (window.location.href = "login.html");
 
-  /* 🔐 Validar usuari administrador */
-  try {
-    const me = await fetch("http://10.4.41.69:8080/user", {
-      headers: { Authorization: `Bearer ${token}` },
-    }).then((r) => r.json());
-
-    if (!me.roles || !me.roles.includes("ROLE_ADMIN")) {
-      alert("⚠️ No tens permisos per accedir a aquesta secció.");
-      return (window.location.href = "overview.html");
-    }
-  } catch (e) {
-    console.error("Error validant admin:", e);
-    return (window.location.href = "login.html");
-  }
-
   const menuLinks = document.querySelectorAll(".menu a");
   const currentPage = window.location.pathname.split("/").pop();
   menuLinks.forEach((link) => {
-    const href = link.getAttribute("href");
-    if (href === "#") {
-      link.addEventListener("click", (e) => e.preventDefault());
-      return;
-    }
-    if (href === currentPage) link.classList.add("active");
+    if (link.getAttribute("href") === currentPage) link.classList.add("active");
   });
 
   const tbody = document.querySelector("#sou-table tbody");
-
   const editPanel = document.getElementById("edit-panel");
   const nomEl = document.getElementById("empleat-nom");
   const salariInput = document.getElementById("edit-salari");
@@ -40,20 +19,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   const saveBtn = document.getElementById("save-btn");
   const cancelBtn = document.getElementById("cancel-btn");
 
+  let selectedUserId = null;
   let currentUser = null;
 
-  /** 📌 Carregar tots els usuaris (amb sou ja inclòs) */
-  async function loadUsers() {
+  // 🔹 Carregar tots els usuaris
+  async function loadUsers(selectedId = null) {
     const res = await fetch("http://10.4.41.69:8080/users", {
       headers: { Authorization: `Bearer ${token}` },
     });
-
     const users = await res.json();
-    renderTable(users);
+    displayUsers(users, selectedId);
   }
 
-  /** 📌 Mostrar taula */
-  function renderTable(users) {
+  function displayUsers(users, selectedId = null) {
     tbody.innerHTML = users
       .map(
         (u) => `
@@ -69,28 +47,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       .join("");
 
     tbody.querySelectorAll("tr").forEach((row) => {
+      const id = row.dataset.id;
+
+      // Afegir click
       row.addEventListener("click", () => {
-        // Treu la classe 'selected' de totes les files
         tbody
           .querySelectorAll("tr")
           .forEach((r) => r.classList.remove("selected"));
-
-        // Afegeix la classe 'selected' només a la fila clicada
         row.classList.add("selected");
-
-        // Selecciona l'usuari corresponent
-        selectUser(users.find((u) => u.id == row.dataset.id));
+        selectedUserId = id;
+        selectUser(users.find((u) => u.id == id));
       });
+
+      // Selecció automàtica si coincideix amb l'ID
+      if (selectedId && id == selectedId) {
+        row.classList.add("selected");
+        selectedUserId = id;
+        selectUser(users.find((u) => u.id == id));
+      }
     });
   }
 
-  /** 📌 Seleccionar usuari i omplir sou directament del JSON */
   function selectUser(user) {
     currentUser = user;
-
     nomEl.textContent = user.name;
 
-    // Si no té sou ➝ inicialitzar a zero
     const s = user.sou || {};
     salariInput.value = s.salari_base || 0;
     complementsInput.value = s.complements || 0;
@@ -100,7 +81,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     editPanel.classList.add("visible");
   }
 
-  /** 💾 Guardar sou (PUT) */
   saveBtn.addEventListener("click", async () => {
     if (!currentUser) return;
 
@@ -117,25 +97,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         seguretat_social_actual: Number(ssInput.value),
       }),
     });
-    showToast();
+
     editPanel.classList.remove("visible");
-    loadUsers(); // 🔄 Actualitzar la taula
+    // 🔄 Recarregar taula mantenint fila seleccionada
+    loadUsers(currentUser.id);
   });
 
   cancelBtn.addEventListener("click", () => {
     editPanel.classList.remove("visible");
     currentUser = null;
+    tbody.querySelectorAll("tr").forEach((r) => r.classList.remove("selected"));
+    selectedUserId = null;
   });
 
-  function showToast() {
-    const toast = document.getElementById("save-toast");
-    toast.classList.add("show");
-
-    setTimeout(() => {
-      toast.classList.remove("show");
-    }, 3000);
-  }
-
-  /** ▶️ Inici */
+  // 🔹 Inici
   loadUsers();
 });
