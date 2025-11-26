@@ -60,9 +60,8 @@ body {
 }
 
 .sidebar-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  margin-bottom: 25px; /* ESPAI FIX */
+  padding-bottom: 10px; /* fa que quedi elegant */
 }
 
 .toggle-menu {
@@ -859,4 +858,81 @@ input[readonly]::placeholder {
 }
 #orders-table tr.selected {
   background: #c9eaff;
+}
+/* === CONTENIDOR GENERAL (llista + imatge centrats) === */
+.overview-section {
+  display: flex;
+  justify-content: center; /* centre horitzontal */
+  align-items: center; /* centre vertical */
+  height: calc(100vh - 180px); /* ocupa l’espai restant menys el header */
+  gap: 80px; /* separació més gran */
+  width: 100%;
+  text-align: center;
+}
+
+/* === LLISTA DE TASQUES === */
+.tasks-container {
+  max-width: 380px; /* més gran */
+}
+
+.tasks-title {
+  font-size: 26px; /* més gran */
+  margin-bottom: 20px;
+  font-weight: 800;
+  color: #2f3542;
+  letter-spacing: 0.5px;
+}
+
+/* === Llista d'elements estilitzada === */
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.task-list li {
+  background: #ffffff;
+  border: 2px solid #dfe4ea;
+  padding: 14px 20px; /* més gran */
+  margin-bottom: 12px;
+  border-radius: 14px;
+  font-size: 17px; /* text més gran */
+  font-weight: 600;
+  color: #2f3542;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  transition: 0.25s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.task-list li:hover {
+  border-color: #3b82f6;
+  background: #eef4ff;
+  transform: scale(1.05);
+}
+
+/* Icones llista */
+.task-list li i {
+  width: 22px;
+  height: 22px;
+  color: #3b82f6;
+}
+
+/* === IMATGE MÉS GRAN I CENTRADA === */
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.right-image {
+  max-width: 560px; /* encara més gran */
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  object-fit: contain;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
