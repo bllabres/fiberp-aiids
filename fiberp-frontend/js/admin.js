@@ -87,26 +87,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     editPanel.classList.add("visible");
   }
 
-  /* 🔹 Guardar dades */
   saveBtn.addEventListener("click", async () => {
     if (!currentUser) return;
 
-    await fetch(`http://10.4.41.69:8080/user/${currentUser.id}/sou`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        salari_base: Number(salariInput.value),
-        complements: Number(complementsInput.value),
-        irpf_actual: Number(irpfInput.value),
-        seguretat_social_actual: Number(ssInput.value),
-      }),
-    });
+    try {
+      const res = await fetch(
+        `http://10.4.41.69:8080/user/${currentUser.id}/sou`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            salari_base: Number(salariInput.value),
+            complements: Number(complementsInput.value),
+            irpf_actual: Number(irpfInput.value),
+            seguretat_social_actual: Number(ssInput.value),
+          }),
+        }
+      );
 
-    editPanel.classList.remove("visible");
-    loadUsers(currentUser.id); // 🔄 Recarregar mantenint selecció
+      if (!res.ok) throw new Error("Error guardant el sou");
+
+      editPanel.classList.remove("visible");
+      alert("Sou guardat correctament!"); // ← Afegeix alert
+      loadUsers(currentUser.id); // 🔄 Recarregar mantenint selecció
+    } catch (err) {
+      console.error(err);
+      alert("No s'ha pogut guardar el sou.");
+    }
   });
 
   cancelBtn.addEventListener("click", () => {
