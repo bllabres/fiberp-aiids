@@ -3,12 +3,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("token");
   if (!token) return (window.location.href = "login.html");
 
+  /* 🔹 Marcar menú actiu */
   const menuLinks = document.querySelectorAll(".menu a");
   const currentPage = window.location.pathname.split("/").pop();
   menuLinks.forEach((link) => {
     if (link.getAttribute("href") === currentPage) link.classList.add("active");
   });
 
+  /* 🔹 Elements DOM */
   const tbody = document.querySelector("#sou-table tbody");
   const editPanel = document.getElementById("edit-panel");
   const nomEl = document.getElementById("empleat-nom");
@@ -22,15 +24,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   let selectedUserId = null;
   let currentUser = null;
 
-  // 🔹 Carregar tots els usuaris
+  /* 🔹 Carregar usuaris */
   async function loadUsers(selectedId = null) {
-    const res = await fetch("http://10.4.41.69:8080/users", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const users = await res.json();
-    displayUsers(users, selectedId);
+    try {
+      const res = await fetch("http://10.4.41.69:8080/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const users = await res.json();
+      displayUsers(users, selectedId);
+    } catch (err) {
+      console.error("Error carregant usuaris:", err);
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Error carregant usuaris</td></tr>`;
+    }
   }
 
+  /* 🔹 Mostrar taula amb selecció */
   function displayUsers(users, selectedId = null) {
     tbody.innerHTML = users
       .map(
@@ -49,7 +57,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     tbody.querySelectorAll("tr").forEach((row) => {
       const id = row.dataset.id;
 
-      // Afegir click
       row.addEventListener("click", () => {
         tbody
           .querySelectorAll("tr")
@@ -59,7 +66,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         selectUser(users.find((u) => u.id == id));
       });
 
-      // Selecció automàtica si coincideix amb l'ID
+      // Selecció automàtica si coincideix amb l'ID passat
       if (selectedId && id == selectedId) {
         row.classList.add("selected");
         selectedUserId = id;
@@ -68,19 +75,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  /* 🔹 Seleccionar usuari i mostrar dades */
   function selectUser(user) {
     currentUser = user;
     nomEl.textContent = user.name;
-
     const s = user.sou || {};
     salariInput.value = s.salari_base || 0;
     complementsInput.value = s.complements || 0;
     irpfInput.value = s.irpf_actual || 0;
     ssInput.value = s.seguretat_social_actual || 0;
-
     editPanel.classList.add("visible");
   }
 
+  /* 🔹 Guardar dades */
   saveBtn.addEventListener("click", async () => {
     if (!currentUser) return;
 
@@ -99,8 +106,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     editPanel.classList.remove("visible");
-    // 🔄 Recarregar taula mantenint fila seleccionada
-    loadUsers(currentUser.id);
+    loadUsers(currentUser.id); // 🔄 Recarregar mantenint selecció
   });
 
   cancelBtn.addEventListener("click", () => {
