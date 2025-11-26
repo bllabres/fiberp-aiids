@@ -1,4 +1,5 @@
 const token = localStorage.getItem("token"); // agafem el token real
+
 if (!token) {
   window.location.href = "../login.html";
 } else {
@@ -21,6 +22,8 @@ if (!token) {
     }
     if (href === currentPage) link.classList.add("active");
   });
+
+  let initialData = {}; // Objecte per guardar els valors inicials del formulari
 
   // Funció per carregar dades de l'usuari
   async function loadUser() {
@@ -45,21 +48,30 @@ if (!token) {
       document.getElementById("perfil-email").textContent = user.email || "";
       document.getElementById("perfil-rol").textContent =
         user.roles?.join(", ") || "";
-      // document.getElementById("perfil-empresa").textContent = user.empresa || ""; // si tens camp empresa
 
       // Omplir formulari
       document.getElementById("nom").value = nomUsuari;
       document.getElementById("cognom").value = cognomsUsuari;
+      document.getElementById("email").value = user.email || "";
       document.getElementById("telefon").value = user.telefon || "";
-      // La contrasenya queda buida per seguretat
       document.getElementById("password").value = "";
       document.getElementById("confirmar").value = "";
+
+      // Guardem els valors inicials per detectar canvis
+      initialData = {
+        nom: nomUsuari,
+        cognom: cognomsUsuari,
+        email: user.email || "",
+        telefon: user.telefon || "",
+      };
     } catch (error) {
       console.error("Error carregant usuari:", error);
       alert("Error carregant les dades del teu perfil");
     }
   }
+
   loadUser();
+
   // Seleccionem el formulari
   const form = document.querySelector(".perfil-card form");
 
@@ -74,6 +86,19 @@ if (!token) {
     const password = document.getElementById("password").value;
     const confirmar = document.getElementById("confirmar").value;
 
+    // Comprovem si s'ha modificat algun camp
+    const changed =
+      nom !== initialData.nom ||
+      cognom !== initialData.cognom ||
+      email !== initialData.email ||
+      telefon !== initialData.telefon ||
+      password.length > 0;
+
+    if (!changed) {
+      alert("No hi ha cap canvi per guardar.");
+      return;
+    }
+
     // Validació simple de contrasenyes
     if (password && password !== confirmar) {
       alert("Les contrasenyes no coincideixen.");
@@ -83,19 +108,18 @@ if (!token) {
       alert("La contrasenya ha de tenir un mínim de 6 caràcters.");
       return;
     }
-    // Preparació de l'objecte a enviar
-    // El backend espera 'name', així que unim nom i cognom si cal
-    const fullName = `${nom} ${cognom}`.trim().replace(/\s+/g, " ");
-    const dadesAEnviar = {
-      name: fullName,
-      email: email,
-      telefon: telefon,
-    };
-
-    // Només afegim la contrasenya si l'usuari n'ha escrit una de nova
-    if (password) {
-      dadesAEnviar.password = password;
+    const telPattern = /^[0-9\s()+-]{9,15}$/;
+    if (telefon && !telPattern.test(telefon)) {
+      alert(
+        "El número de telèfon no és vàlid. Ha de contenir només números i opcionalment espais, guions o parèntesis, amb 9-15 caràcters."
+      );
+      return;
     }
+
+    // Preparació de l'objecte a enviar
+    const fullName = `${nom} ${cognom}`.trim().replace(/\s+/g, " ");
+    const dadesAEnviar = { name: fullName, email, telefon };
+    if (password) dadesAEnviar.password = password;
 
     try {
       const response = await fetch("http://10.4.41.69:8080/user", {
@@ -110,9 +134,7 @@ if (!token) {
       if (response.ok) {
         const result = await response.json();
         alert("Dades actualitzades correctament!");
-
-        loadUser();
-
+        loadUser(); // recarregar dades i actualitzar initialData
         document.getElementById("password").value = "";
         document.getElementById("confirmar").value = "";
       } else {
