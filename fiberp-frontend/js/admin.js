@@ -4,19 +4,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!token) return (window.location.href = "login.html");
 
   try {
-    // 🔹 Comprovar rol de l'usuari
-    const meRes = await fetch("http://10.4.41.69:8080/me", {
+    const me = await fetch("http://10.4.41.69:8080/user", {
       headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!meRes.ok) throw new Error("No s'ha pogut verificar l'usuari");
+    }).then((r) => r.json());
 
-    const me = await meRes.json();
-    if (!me.roles.includes("ROLE_ADMIN")) {
-      alert("⚠️ Només els administradors poden accedir a aquesta pàgina.");
-      return (window.location.href = "login.html");
+    if (!me.roles || !me.roles.includes("ROLE_ADMIN")) {
+      alert("⚠️ No tens permisos per accedir a aquesta secció.");
+      return (window.location.href = "overview.html");
     }
-  } catch (err) {
-    console.error(err);
+  } catch (e) {
+    console.error("Error validant admin:", e);
     return (window.location.href = "login.html");
   }
 
