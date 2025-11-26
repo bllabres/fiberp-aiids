@@ -3,6 +3,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("token");
   if (!token) return (window.location.href = "login.html");
 
+  try {
+    // 🔹 Comprovar rol de l'usuari
+    const meRes = await fetch("http://10.4.41.69:8080/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!meRes.ok) throw new Error("No s'ha pogut verificar l'usuari");
+
+    const me = await meRes.json();
+    if (!me.roles.includes("ROLE_ADMIN")) {
+      alert("⚠️ Només els administradors poden accedir a aquesta pàgina.");
+      return (window.location.href = "login.html");
+    }
+  } catch (err) {
+    console.error(err);
+    return (window.location.href = "login.html");
+  }
+
   /* 🔹 Marcar menú actiu */
   const menuLinks = document.querySelectorAll(".menu a");
   const currentPage = window.location.pathname.split("/").pop();
