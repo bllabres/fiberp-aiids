@@ -11,12 +11,14 @@ use Psr\Log\LoggerInterface;
 class LoginSubscriber implements EventSubscriberInterface
 {
     private LoggerInterface $logger;
-
+    private LoggerInterface $out_of_working_hours_logger;
     public function __construct(
-        #[Autowire(service: 'monolog.logger.login')]LoggerInterface $logger
+        #[Autowire(service: 'monolog.logger.login')]LoggerInterface $logger,
+        #[Autowire(service: 'monolog.logger.out_of_working_hours')]LoggerInterface $out_of_working_hours_logger
     )
     {
         $this->logger = $logger;
+        $this->out_of_working_hours_logger = $out_of_working_hours_logger;
     }
 
     public static function getSubscribedEvents(): array
@@ -49,7 +51,7 @@ class LoginSubscriber implements EventSubscriberInterface
 
         // Si la hora actual NO está dentro del rango
         if (!$is_admin && ($hora_actual < $hora_inici || $hora_actual > $hora_fi)) {
-            $this->logger->warning('Login out of working hours', [
+            $this->out_of_working_hours_logger->warning('Login out of working hours', [
                 'ip' => $ip,
                 'hora_actual' => $hora_actual,
                 'user' => $user->getEmail(),
