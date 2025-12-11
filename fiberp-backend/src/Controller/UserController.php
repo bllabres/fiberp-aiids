@@ -58,7 +58,8 @@ final class UserController extends AbstractController
         return $this->json($userData);
     }
 
-    #[Route('/user', name: 'app_user')]
+
+    #[Route('/user', name: 'app_user', methods: ['GET'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function getUserData(): JsonResponse
     {
@@ -74,7 +75,7 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/user', name: 'app_user_update', methods: ['PUT', 'PATCH'])]
+    #[Route('/user', name: 'app_user_update', methods: ['PUT', 'PATCH', 'UPDATE'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function updateUser(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
@@ -94,22 +95,22 @@ final class UserController extends AbstractController
         $changed = false;
         $updatedFields = [];
 
-        if (isset($data['email'])) {
+        if (isset($data['email']) && trim($data['email']) !== '') {
             $user->setEmail($data['email']);
             $changed = true;
             $updatedFields[] = 'email';
         }
-        if (isset($data['name'])) {
+        if (isset($data['name']) && trim($data['name']) !== '') {
             $user->setName($data['name']);
             $changed = true;
             $updatedFields[] = 'name';
         }
-        if (isset($data['telefon'])) {
+        if (isset($data['telefon']) && trim($data['telefon']) !== '') {
             $user->setTelefon($data['telefon']);
             $changed = true;
             $updatedFields[] = 'telefon';
         }
-        if (isset($data['password'])) {
+        if (isset($data['password']) && trim($data['password']) !== '') {
             $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
             $user->setPassword($hashedPassword);
             $changed = true;
@@ -128,6 +129,7 @@ final class UserController extends AbstractController
         $user->setUpdatedAt(new DateTime('now'));
 
         try {
+            $em->persist($user);
             $em->flush();
         } catch (UniqueConstraintViolationException $e) {
             $this->logger->error('Email uniqueness violation on self update', ['actor_id' => $user?->getId(), 'email' => $data['email'] ?? null]);

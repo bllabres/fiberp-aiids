@@ -52,7 +52,8 @@ class LoginSubscriber implements EventSubscriberInterface
             $this->logger->warning('Login out of working hours', [
                 'ip' => $ip,
                 'hora_actual' => $hora_actual,
-                'user' => $user,
+                'user' => $user->getEmail(),
+                'user_roles' => $user->getRoles(),
             ]);
         }
     }
