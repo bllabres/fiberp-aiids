@@ -1,17 +1,15 @@
-const token = localStorage.getItem("token"); // agafem el token real
+const token = localStorage.getItem("token");
 
 if (!token) {
   window.location.href = "../login.html";
 } else {
   lucide.createIcons();
 
-  // Logout
   document.querySelector(".logout-btn").addEventListener("click", () => {
     localStorage.removeItem("token");
     window.location.href = "login.html";
   });
 
-  // Marcar menú actiu
   const menuLinks = document.querySelectorAll(".menu a");
   const currentPage = window.location.pathname.split("/").pop();
   menuLinks.forEach((link) => {
@@ -23,9 +21,8 @@ if (!token) {
     if (href === currentPage) link.classList.add("active");
   });
 
-  let initialData = {}; // Objecte per guardar els valors inicials del formulari
+  let initialData = {};
 
-  // Funció per carregar dades de l'usuari
   async function loadUser() {
     try {
       const response = await fetch("http://10.4.41.69:8080/user", {
@@ -43,13 +40,11 @@ if (!token) {
       const nomUsuari = parts[0] || "";
       const cognomsUsuari = parts.length > 1 ? parts.slice(1).join(" ") : "";
 
-      // Omplir vista lateral
       document.getElementById("perfil-nombre").textContent = user.name || "";
       document.getElementById("perfil-email").textContent = user.email || "";
       document.getElementById("perfil-rol").textContent =
         user.roles?.join(", ") || "";
 
-      // Omplir formulari
       document.getElementById("nom").value = nomUsuari;
       document.getElementById("cognom").value = cognomsUsuari;
       document.getElementById("email").value = user.email || "";
@@ -57,7 +52,6 @@ if (!token) {
       document.getElementById("password").value = "";
       document.getElementById("confirmar").value = "";
 
-      // Guardem els valors inicials per detectar canvis
       initialData = {
         nom: nomUsuari,
         cognom: cognomsUsuari,
@@ -72,13 +66,11 @@ if (!token) {
 
   loadUser();
 
-  // Seleccionem el formulari
   const form = document.querySelector(".perfil-card form");
 
   form.addEventListener("submit", async (event) => {
-    event.preventDefault(); // Evitem que la pàgina es recarregui
+    event.preventDefault();
 
-    // Recollim valors dels inputs
     const nom = document.getElementById("nom").value.trim();
     const cognom = document.getElementById("cognom").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -86,7 +78,6 @@ if (!token) {
     const password = document.getElementById("password").value;
     const confirmar = document.getElementById("confirmar").value;
 
-    // Comprovem si s'ha modificat algun camp
     const changed =
       nom !== initialData.nom ||
       cognom !== initialData.cognom ||
@@ -99,7 +90,6 @@ if (!token) {
       return;
     }
 
-    // Validació simple de contrasenyes
     if (password && password !== confirmar) {
       alert("Les contrasenyes no coincideixen.");
       return;
@@ -116,7 +106,6 @@ if (!token) {
       return;
     }
 
-    // Preparació de l'objecte a enviar
     const fullName = `${nom} ${cognom}`.trim().replace(/\s+/g, " ");
     const dadesAEnviar = { name: fullName, email, telefon };
     if (password) dadesAEnviar.password = password;
@@ -134,7 +123,7 @@ if (!token) {
       if (response.ok) {
         const result = await response.json();
         alert("Dades actualitzades correctament!");
-        loadUser(); // recarregar dades i actualitzar initialData
+        loadUser();
         document.getElementById("password").value = "";
         document.getElementById("confirmar").value = "";
       } else {

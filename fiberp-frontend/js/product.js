@@ -8,7 +8,6 @@ function runWithToken(callback) {
   callback(token);
 }
 
-// 🔹 Funció per obtenir productes del servidor
 async function fetchProducts(token, afegirAComanda) {
   try {
     const response = await fetch("http://10.4.41.69:8080/product", {
@@ -49,7 +48,6 @@ async function fetchProducts(token, afegirAComanda) {
       )
       .join("");
 
-    // Afegim comportament als botons
     document.querySelectorAll(".product-card").forEach((card) => {
       const minusBtn = card.querySelector(".minus");
       const plusBtn = card.querySelector(".plus");
@@ -91,13 +89,11 @@ async function fetchProducts(token, afegirAComanda) {
 runWithToken((token) => {
   lucide.createIcons();
 
-  // 🔹 Logout
   document.querySelector(".logout-btn").addEventListener("click", () => {
     localStorage.removeItem("token");
     window.location.href = "login.html";
   });
 
-  // 🔹 Marcar el menú actiu
   const menuLinks = document.querySelectorAll(".menu a");
   const currentPage = window.location.pathname.split("/").pop();
 
@@ -110,7 +106,6 @@ runWithToken((token) => {
     if (href === currentPage) link.classList.add("active");
   });
 
-  // 🔹 Dades de la comanda
   const comanda = [];
 
   const scrollBtn = document.getElementById("scrollToOrderBtn");
@@ -122,7 +117,6 @@ runWithToken((token) => {
     });
   }
 
-  // 🔹 Renderitzar comanda
   function renderComanda() {
     const orderList = document.getElementById("orderList");
     if (!orderList) return;
@@ -150,7 +144,6 @@ runWithToken((token) => {
     `;
   }
 
-  // 🔹 Afegir producte a la comanda
   function afegirAComanda(producte, btn) {
     const existent = comanda.find((p) => p.nom === producte.nom);
     if (existent) {
@@ -170,7 +163,6 @@ runWithToken((token) => {
     }, 1000);
   }
 
-  // 🔹 Confirmar comanda
   const confirmBtn = document.getElementById("confirmOrderBtn");
   if (confirmBtn) {
     confirmBtn.addEventListener("click", async () => {
@@ -222,6 +214,5 @@ runWithToken((token) => {
     });
   }
 
-  // 🔹 Crida real al backend
   fetchProducts(token, afegirAComanda);
 });

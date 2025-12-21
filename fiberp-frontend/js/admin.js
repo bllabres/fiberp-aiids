@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }).then((r) => r.json());
 
     if (!me.roles || !me.roles.includes("ROLE_ADMIN")) {
-      alert("⚠️ No tens permisos per accedir a aquesta secció.");
+      alert("No tens permisos per accedir a aquesta secció.");
       return (window.location.href = "overview.html");
     }
   } catch (e) {
@@ -17,14 +17,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     return (window.location.href = "login.html");
   }
 
-  /* 🔹 Marcar menú actiu */
   const menuLinks = document.querySelectorAll(".menu a");
   const currentPage = window.location.pathname.split("/").pop();
   menuLinks.forEach((link) => {
     if (link.getAttribute("href") === currentPage) link.classList.add("active");
   });
 
-  /* 🔹 Elements DOM */
   const tbody = document.querySelector("#sou-table tbody");
   const editPanel = document.getElementById("edit-panel");
   const nomEl = document.getElementById("empleat-nom");
@@ -38,7 +36,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   let selectedUserId = null;
   let currentUser = null;
 
-  /* 🔹 Carregar usuaris */
   async function loadUsers(selectedId = null) {
     try {
       const res = await fetch("http://10.4.41.69:8080/users", {
@@ -52,7 +49,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  /* 🔹 Mostrar taula amb selecció */
   function displayUsers(users, selectedId = null) {
     tbody.innerHTML = users
       .map(
@@ -80,7 +76,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         selectUser(users.find((u) => u.id == id));
       });
 
-      // Selecció automàtica si coincideix amb l'ID passat
       if (selectedId && id == selectedId) {
         row.classList.add("selected");
         selectedUserId = id;
@@ -89,7 +84,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  /* 🔹 Seleccionar usuari i mostrar dades */
   function selectUser(user) {
     currentUser = user;
     nomEl.textContent = user.name;
@@ -125,8 +119,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!res.ok) throw new Error("Error guardant el sou");
 
       editPanel.classList.remove("visible");
-      alert("Sou guardat correctament!"); // ← Afegeix alert
-      loadUsers(currentUser.id); // 🔄 Recarregar mantenint selecció
+      alert("Sou guardat correctament!");
+      loadUsers(currentUser.id);
     } catch (err) {
       console.error(err);
       alert("No s'ha pogut guardar el sou.");
@@ -140,6 +134,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     selectedUserId = null;
   });
 
-  // 🔹 Inici
   loadUsers();
 });

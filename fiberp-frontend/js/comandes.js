@@ -9,14 +9,11 @@ function runWithToken(callback) {
 
 runWithToken((token) => {
   lucide.createIcons();
-
-  // 🔹 Logout
   document.querySelector(".logout-btn").addEventListener("click", () => {
     localStorage.removeItem("token");
     window.location.href = "login.html";
   });
 
-  // 🔹 Marcar menú actiu
   const menuLinks = document.querySelectorAll(".menu a");
   const currentPage = window.location.pathname.split("/").pop();
   menuLinks.forEach((link) => {
@@ -29,7 +26,6 @@ runWithToken((token) => {
 
   let selectedOrderId = null;
 
-  // 🔹 Funció per mostrar la llista de comandes
   function displayOrders(orders) {
     tbody.innerHTML = orders
       .map(
@@ -45,20 +41,18 @@ runWithToken((token) => {
       )
       .join("");
 
-    // Afegir click a cada fila
     tbody.querySelectorAll("tr").forEach((row) => {
       row.addEventListener("click", () => {
         tbody
           .querySelectorAll("tr")
           .forEach((r) => r.classList.remove("selected"));
         row.classList.add("selected");
-        selectedOrderId = row.dataset.orderId; // Guardem la comanda seleccionada
+        selectedOrderId = row.dataset.orderId;
         fetchOrderDetails(selectedOrderId);
       });
     });
   }
 
-  // 🔹 Funció per obtenir comandes del backend
   async function fetchOrders() {
     try {
       const response = await fetch("http://10.4.41.69:8080/order", {
@@ -78,7 +72,6 @@ runWithToken((token) => {
     }
   }
 
-  // 🔹 Funció per obtenir detalls d’una comanda
   async function fetchOrderDetails(orderId) {
     try {
       const response = await fetch(`http://10.4.41.69:8080/order/${orderId}`, {
@@ -92,7 +85,6 @@ runWithToken((token) => {
 
       const order = await response.json();
 
-      // Mostrar detalls dins el HTML
       detailsContainer.innerHTML = `
         <p><strong>ID:</strong> ${order.id}</p>
         <p><strong>Estat:</strong> ${order.estat}</p>
@@ -132,14 +124,11 @@ runWithToken((token) => {
     }
   }
 
-  // 🔹 Inicialment carreguem la llista de comandes
   fetchOrders();
 
-  // 🔹 Botó pujar albarà
   const uploadBtn = document.getElementById("uploadAlbaraBtn");
   const fileInput = document.getElementById("inputAlbara");
 
-  // Activar input quan cliques el botó
   uploadBtn.addEventListener("click", () => {
     if (!selectedOrderId) {
       alert("Selecciona una comanda primer!");
@@ -148,13 +137,12 @@ runWithToken((token) => {
     fileInput.click();
   });
 
-  // Quan escull fitxer, el puja
   fileInput.addEventListener("change", async () => {
     const file = fileInput.files[0];
     if (!file) return;
 
     const formData = new FormData();
-    formData.append("albara_file", file); // Nom que espera Symfony
+    formData.append("albara_file", file);
 
     try {
       const res = await fetch(
@@ -163,7 +151,6 @@ runWithToken((token) => {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
-            // No posar 'Content-Type': FormData el gestiona
           },
           body: formData,
         }
@@ -175,10 +162,10 @@ runWithToken((token) => {
         fetchOrders();
       } else {
         const errorText = await res.text();
-        alert(`❌ Error pujant l’albarà: ${errorText}`);
+        alert(`Error pujant l’albarà: ${errorText}`);
       }
     } catch (err) {
-      alert("⚠️ Error amb la pujada");
+      alert("Error amb la pujada");
       console.error(err);
     }
   });

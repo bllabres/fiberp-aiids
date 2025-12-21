@@ -6,10 +6,6 @@
   --muted: #6b7280;
   --font-family: "Inter", ui-sans-serif, system-ui;
 }
-
-/* ============================== */
-/*         FITXATGE / GENERAL     */
-/* ============================== */
 .fitxatge-container {
   background: rgba(255, 255, 255, 0.85);
   padding: 40px 50px;
@@ -98,7 +94,6 @@
   box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
 }
 
-/* Botó guardar */
 .btn-guardar {
   padding: 6px 14px;
   background: var(--accent);
@@ -118,19 +113,16 @@
   box-shadow: 0 8px 22px rgba(37, 99, 235, 0.25);
 }
 
-/* ============================== */
-/*       SOU - GRAN I DESTACAT    */
-/* ============================== */
 .sou-container {
   margin: 40px auto;
   padding: 40px 50px;
-  max-width: 800px; /* més ample */
+  max-width: 800px;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 16px;
   box-shadow: 0 12px 32px rgba(16, 24, 40, 0.12);
   backdrop-filter: blur(15px);
   text-align: center;
-  font-size: 18px; /* text més gran */
+  font-size: 18px;
 }
 
 .sou-item {
@@ -161,7 +153,6 @@
   transition: all 0.3s ease;
 }
 
-/* Status colors */
 .status-info {
   background: rgba(37, 99, 235, 0.1);
   border: 1px solid rgba(37, 99, 235, 0.3);
@@ -180,7 +171,6 @@
   color: #991b1b;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .sou-container {
     width: 95%;
@@ -208,7 +198,6 @@
   }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .sou-container table,
   .sou-container thead,
@@ -248,11 +237,9 @@
     margin-top: 6px;
   }
 }
-/* ============================== */
-/*       PANELL D'EDICIÓ          */
-/* ============================== */
+
 .edit-panel {
-  margin: 12px auto 24px; /* centrat sota la taula */
+  margin: 12px auto 24px;
   padding: 16px 20px;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(var(--blur));
@@ -266,8 +253,8 @@
   overflow: hidden;
   opacity: 0;
 
-  width: 90%; /* més estret */
-  max-width: 500px; /* ample màxim definit */
+  width: 90%;
+  max-width: 500px;
 }
 
 .edit-panel.visible {
@@ -353,7 +340,6 @@
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .edit-panel {
     width: 95%;
@@ -378,7 +364,7 @@
 }
 
 #edit-panel {
-  position: relative; /* perquè el toast sigui relatiu al panell */
+  position: relative;
 }
 
 #save-toast {

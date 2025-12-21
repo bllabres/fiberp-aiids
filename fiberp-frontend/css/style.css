@@ -172,7 +172,6 @@ input:focus {
   font-size: 13px;
 }
 
-/* responsive */
 @media (max-width: 880px) {
   .container {
     grid-template-columns: 1fr;
@@ -183,7 +182,6 @@ input:focus {
   }
 }
 
-/* tiny animations */
 .fade-up {
   animation: fadeUp 0.6s ease both;
 }

@@ -20,7 +20,6 @@ runWithToken((token) => {
     return;
   }
 
-  // Rellotge gegant
   function updateClock() {
     const now = new Date();
     clockDiv.textContent = now.toLocaleTimeString("ca-ES", { hour12: false });
@@ -50,7 +49,7 @@ runWithToken((token) => {
 
   function formatTimePlusOneHour(isoString) {
     const d = new Date(isoString);
-    d.setHours(d.getHours() + 1); // sumem 1 hora manualment
+    d.setHours(d.getHours() + 1);
     return d.toLocaleTimeString("ca-ES", { hour12: false });
   }
 

@@ -10,7 +10,6 @@ function runWithToken(callback) {
 runWithToken((token) => {
   lucide.createIcons();
 
-  // Logout
   const logoutBtn = document.querySelector(".logout-btn");
   logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("token");
@@ -28,14 +27,12 @@ runWithToken((token) => {
     if (href === currentPage) link.classList.add("active");
   });
 
-  // Elements on mostrar les dades de sou
   const salariBaseEl = document.getElementById("salari_base");
   const complementsEl = document.getElementById("complements");
   const irpfEl = document.getElementById("irpf_actual");
   const ssEl = document.getElementById("seguretat_social_actual");
   const statusDiv = document.getElementById("sou-status");
 
-  // Funció per mostrar missatges d'estat
   function setStatus(msg, type = "info") {
     statusDiv.textContent = msg;
     statusDiv.className = "";
@@ -48,7 +45,6 @@ runWithToken((token) => {
     );
   }
 
-  // Funció per carregar dades del sou
   async function carregarSou() {
     try {
       const res = await fetch("http://10.4.41.69:8080/user/sou", {
